@@ -28,17 +28,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_program(CLANG   clang)
 find_program(CLANGXX clang++)
 
-# prefer clang instead of gcc (or whatever garbage compiler they're using) This can be disabled with
-# the NO_CLANG option
-option(NO_CLANG "Don't prefer clang for compilation" OFF)
-if (NOT NO_CLANG)
-  if (CLANG)
-    set(CMAKE_C_COMPILER ${CLANG})
-  endif (CLANG)
-  if (CLANGXX)
-    set(CMAKE_CXX_COMPILER ${CLANGXX})
-  endif (CLANGXX)
-endif (NOT NO_CLANG)
+if (NOT WIN32)
+  # prefer clang instead of gcc (or whatever garbage compiler they're using) This can be disabled with
+  # the NO_CLANG option
+  option(NO_CLANG "Don't prefer clang for compilation" OFF)
+  if (NOT NO_CLANG)
+    if (CLANG)
+      set(CMAKE_C_COMPILER ${CLANG})
+    endif (CLANG)
+    if (CLANGXX)
+      set(CMAKE_CXX_COMPILER ${CLANGXX})
+    endif (CLANGXX)
+  endif (NOT NO_CLANG)
+endif (NOT WIN32)
 
 project(tos
   VERSION ${VERSION_SIMPLE}
@@ -52,20 +54,11 @@ option(WARNINGS_AS_ERRORS "Set certain warnings to be treated as errors by the c
 set(CPP_EXECUTABLE_SOURCE_FILES main.cxx dbg.cxx sdl_window.cxx runtime.cxx tos_aot.cxx mem.cxx multic.cxx vfs.cxx TOSPrint.cxx)
 set(C_EXECUTABLE_SOURCE_FILES sound.c ext/dyad.c ext/argtable3.c)
 
-if (NOT WIN32)
 set_source_files_properties(CPP_EXECUTABLE_SOURCE_FILES
   PROPERTIES
     LANGUAGE CXX
     COMPILE_FLAGS "-fno-rtti -fno-exceptions"
 )
-else()
-# ld on windows doesnt like an absent eh table
-set_source_files_properties(CPP_EXECUTABLE_SOURCE_FILES
-  PROPERTIES
-    LANGUAGE CXX
-    COMPILE_FLAGS "-fno-rtti"
-)
-endif()
 
 set_source_files_properties(C_EXECUTABLE_SOURCE_FILES}
   PROPERTIES
