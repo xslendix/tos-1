@@ -100,7 +100,7 @@ void* NewVirtualChunk(size_t sz, bool low32) {
     }
     MEMORY_BASIC_INFORMATION ent;
     uint64_t alloc = dwAllocationGranularity, addr;
-    while (alloc == (alloc & 0xFFffFFff)) {
+    while (alloc <= 0xFFffFFff) {
       if (!VirtualQuery((void*)alloc, &ent, sizeof(ent)))
         return nullptr;
       alloc = (uint64_t)ent.BaseAddress + ent.RegionSize;
