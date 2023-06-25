@@ -5,26 +5,26 @@
 ### support only for >=Win10, msvc unsupported
 install msys2, launch the "MSYS2 MINGW64 Shell", and run the following
 ```
-pacman -Syu make yasm mingw-w64-x86_64-{gcc,SDL2,cmake,libuv}
+pacman -Syu make yasm mingw-w64-x86_64-{clang,SDL2,cmake,libuv}
 ```
 ## unix-like system users
-install SDL2, cmake, make, yasm, portaudio and libuv
+install SDL2, cmake, make, yasm, gcc/clang(clang preferred) and libuv
 ## building the loader
 ```
 mkdir build;cd build;
 cmake ..; # *nix
-cmake .. -G 'MSYS Makefiles' # win32
+cmake .. -G 'MSYS Makefiles' # win32, -G flag very important
 make -j$(nproc);
 ```
 # build runtime
 ```
 cp HCRT_BOOTSTRAP.BIN HCRT.BIN
-./tos -ctT BuiltHCRT.BIN
+./tos -ctT BuildHCRT.BIN
 mv T/HCRT.BIN .
 ```
 # run
 ```
-./tos -t T #-h for other flags
+./tos -t T #-h for info on other flags
 ```
 # caveat
 due to running in userspace, context switching is around 4 times slower <br>
