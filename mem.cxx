@@ -7,6 +7,7 @@ using std::ios;
 namespace fs = std::filesystem;
 #include <memory>
 #include <utility>
+#include <iostream>
 
 #include <signal.h>
 #include <stdint.h>
