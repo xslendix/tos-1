@@ -92,22 +92,22 @@ void* NewVirtualChunk(size_t sz, bool low32) {
 #else
   if (low32) { // code heap
     // https://stackoverflow.com/questions/54729401/allocating-memory-within-a-2gb-range
-    MEMORY_BASIC_INFORMATION ent;
-    static int64_t dwAllocationGranularity;
-    if (!dwAllocationGranularity) {
+    static DWORD dwAllocationGranularity = 0;
+    if (dwAllocationGranularity == 0) {
       SYSTEM_INFO si;
       GetSystemInfo(&si);
       dwAllocationGranularity = si.dwAllocationGranularity;
     }
-    int64_t alloc = dwAllocationGranularity, addr;
-    while (alloc <= 0xffFFFFff) {
+    MEMORY_BASIC_INFORMATION ent;
+    uint64_t alloc = dwAllocationGranularity, addr;
+    while (alloc == (alloc & 0xFFffFFff)) {
       if (!VirtualQuery((void*)alloc, &ent, sizeof(ent)))
-        return NULL;
-      alloc = (int64_t)ent.BaseAddress + ent.RegionSize;
+        return nullptr;
+      alloc = (uint64_t)ent.BaseAddress + ent.RegionSize;
       // Fancy code to round up because
       // address is rounded down with
       // VirtualAlloc
-      addr = ((int64_t)ent.BaseAddress + dwAllocationGranularity - 1) &
+      addr = ((uint64_t)ent.BaseAddress + dwAllocationGranularity - 1) &
              ~(dwAllocationGranularity - 1);
       if ((ent.State == MEM_FREE) && (sz <= (alloc - addr))) {
         return VirtualAlloc((void*)addr, sz, MEM_COMMIT | MEM_RESERVE,
