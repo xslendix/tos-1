@@ -148,7 +148,7 @@ U0 DebuggerLandWin(I64 sig,I64 *gps) {
   }
   Bool b=FALSE;
 //General purpose registers are in this order,16 is RIP
-  //https://wiki.osdev.org/X86-64_Instruction_Encoding
+  //https://archive.md/kdCG4
   _RAX=gps[0];
   _RCX=gps[1];
   _RDX=gps[2];
@@ -215,7 +215,7 @@ U0 DebuggerLand(I64 sig,I64 *gps) {
     ExitTOS;
   }
 //General purpose registers are in this order,16 is RIP
-  //https://wiki.osdev.org/X86-64_Instruction_Encoding
+  //https://archive.md/kdCG4
   _RAX=gps[0];
   _RCX=gps[1];
   _RDX=gps[2];
@@ -464,7 +464,7 @@ public U0 S(U8 *ip=INVALID_PTR,CTask *task=NULL) //Single-step.
   if (!task) task=GetDebuggedProcess;
   PUSHFD
   if (ip!=INVALID_PTR) task->rip=ip;
-//https://en.wikipedia.org/wiki/Trap_flag
+//https://archive.md/wip/1GmTs
   LBts(&task->task_flags,TASKf_DISABLE_BPTS);
   LBts(&task->task_flags,TASKf_JUST_STEPPED);
   LBts(&task->rflags,RFLAGf_TRAP);

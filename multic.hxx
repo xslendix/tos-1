@@ -18,7 +18,7 @@ size_t CoreNum();
 
 void InterruptCore(size_t core);
 
-// https://text.causal.agency/020-c-style.txt
+// https://archive.md/nKvoK
 typedef void* VoidCallback(void*);
 void LaunchCore0(VoidCallback* fp);
 void WaitForCore0();

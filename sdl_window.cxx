@@ -143,7 +143,7 @@ static void DrawWindowUpdate_pre(CDrawWindow* ul, uint8_t* colors,
 
 void DrawWindowUpdate(struct CDrawWindow* w, int8_t* colors,
                       int64_t internal_width, int64_t h) {
-  // https://stackoverflow.com/questions/27414548/sdl-timers-and-waitevent
+  // https://archive.md/yD5QL
   SDL_Event event;
   SDL_UserEvent userevent;
 

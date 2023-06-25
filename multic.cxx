@@ -171,7 +171,7 @@ void LaunchCore0(void* (*fp)(void*)) {
   SetThreadPriority(cores[0].thread, THREAD_PRIORITY_HIGHEST);
   cores[0].is_alive = true;
   // im not going to use SEH or some crazy bulllshit to set the
-  // thread name on windows(https://archive.is/9jiD5)
+  // thread name on windows(https://archive.md/9jiD5)
 #else
   pthread_create(&cores[0].thread, nullptr, fp, nullptr);
   pthread_setname_np(cores[0].thread, "Seth");

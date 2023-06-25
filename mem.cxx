@@ -91,7 +91,7 @@ void* NewVirtualChunk(size_t sz, bool low32) {
   return ret;
 #else
   if (low32) { // code heap
-    // https://stackoverflow.com/questions/54729401/allocating-memory-within-a-2gb-range
+    // https://archive.md/ugIUC
     static DWORD dwAllocationGranularity = 0;
     if (dwAllocationGranularity == 0) {
       SYSTEM_INFO si;

@@ -29,7 +29,7 @@ static LONG WINAPI VectorHandler(struct _EXCEPTION_POINTERS* info) {
     FERR(INVALID_DISPOSITION);
     FERR(STACK_OVERFLOW);
     FERR(BREAKPOINT);
-  // https://stackoverflow.com/questions/16271828/is-set-single-step-trap-available-on-win-7
+  // https://archive.md/sZzVj
   case STATUS_SINGLE_STEP:
     break;
   default:
