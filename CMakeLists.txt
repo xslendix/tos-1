@@ -52,11 +52,20 @@ option(WARNINGS_AS_ERRORS "Set certain warnings to be treated as errors by the c
 set(CPP_EXECUTABLE_SOURCE_FILES main.cxx dbg.cxx sdl_window.cxx runtime.cxx tos_aot.cxx mem.cxx multic.cxx vfs.cxx TOSPrint.cxx)
 set(C_EXECUTABLE_SOURCE_FILES sound.c ext/dyad.c ext/argtable3.c)
 
+if (NOT WIN32)
 set_source_files_properties(CPP_EXECUTABLE_SOURCE_FILES
   PROPERTIES
     LANGUAGE CXX
     COMPILE_FLAGS "-fno-rtti -fno-exceptions"
 )
+else()
+# ld on windows doesnt like an absent eh table
+set_source_files_properties(CPP_EXECUTABLE_SOURCE_FILES
+  PROPERTIES
+    LANGUAGE CXX
+    COMPILE_FLAGS "-fno-rtti"
+)
+endif()
 
 set_source_files_properties(C_EXECUTABLE_SOURCE_FILES}
   PROPERTIES
