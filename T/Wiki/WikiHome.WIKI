@@ -1,0 +1,22 @@
+{no-toc}
+==Welcome to the Offical 3Days wiki
+This website is about 3Days which is an implementation of a TempleOS runtime under Linux,Windows/FreeBSD. Code here should work under TempleOS also. Here are some links to get started,but this website is still under construction. If you want to Contibute,you'll have to ask *nrootconauto@gmail.com* as this server is under development. 
+
+* [WikiHome Home]
+* Topics
+** [StartHolyC Getting started]
+** HolyC
+*** Graphics
+**** [GraphicsBasic Basic graphics]
+*** [Sound]
+*** [HolyAsm HolyC Assembly]
+*** [MetaData Class meta-data]
+*** [DolDoc DolDoc and fun]
+*** [Input User Input from Keyboard and Mouse]
+*** [Multic Multithreading]
+*** [DataStructs..WIKI Useful Data Structures]
+*** [Strings]
+**** [Print Displaying Strings]
+*** [FileSystem Files and FileSystem stuff]
+** TempleOS
+*** [TempleKernel TempleOS internals - Kernel]

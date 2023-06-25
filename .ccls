@@ -1,0 +1,6 @@
+clang
+%c -std=gnu11
+%cpp -std=c++20
+-Iext
+-DUSE_NETWORKING
+-Wall

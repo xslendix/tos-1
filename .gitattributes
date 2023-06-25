@@ -1,0 +1,4 @@
+* text=auto
+*.HH linguist-language=HolyC
+*.HC linguist-language=HolyC
+ext/** linguist-vendored

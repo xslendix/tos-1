@@ -1,0 +1,5 @@
+==About this Wiki
+
+This wiki was created because of the lack of a good simple TempleOS wiki explaining the technical aspects of HolyC and TempleOS. The only wiki dedicated to Terry Davis is [https://wiki.templeos.org/], which basically contains nothing. So I decided to make my own.
+
+This wiki is more or less a technical wiki, explaining TempleOS/HolyC and its inner workings for easier development and better understanding, so it's not Terry Davis' biography or anything like that. If you'd like his life drama, there are tons of internet articles/podcasts/whatever to moisten your eye sockets. So keep in mind that this wiki might not contain robust information about Terry Davis and his life, although we would like to document thoroughly about him later on, after this wiki is almost finished. 

@@ -1,0 +1,21 @@
+==TODO
+{{entry}}
+{{data}}
+{{checkbox=1655639451;0}}  Finish HolyC caveats
+
+{{checkbox=1655639448;0}}  A combined guide of C and HolyC
+
+{{checkbox=1655639443;0}}  Some more notes on HolyC like the subswitch
+
+{{checkbox=1655639440;0}}  More guides on graphics, multithreading and sound
+
+{{checkbox=1655639437;0}}  More guides on how to take advantage of and use various TempleOS functionalities
+
+{{checkbox=1655639434;0}}  Guides on TempleOS internals, such as tweaking the kernel
+
+{{checkbox=1655639431;0}}  Guides on bitwise operators, and Assembly
+
+{{checkbox=1655639428;0}}  How CPUs and other hardware work
+
+{{delete}}{{save}}
+

@@ -1,0 +1,38 @@
+=Quick Guide 
+You can do cool stuff in TempleOS Tiki
+== Horizontal Rule
+-----
+ -----
+== Bold
+I am *bold*
+ I am *bold*
+== Italic
+I am /italic/
+ I am /italic/
+== Underline
+I am _underline_
+ I am _underline_
+== Highlight
+I am +highlighted+
+ I am +highlighted+
+== Headers
+These will make a table of contents(can be disabled with !{no-toc!})
+ = Header 1
+ == Header 2
+ === Header 3
+ ==== Header 4
+== Escape sequences 
+Use ! to escape a formatting character 
+I64 !*Foo(I64 !* foo=1!/3);
+ I64 !*Foo(I64 !* foo=1!/3);
+== Lists
+* 1
+** 2
+** 3
+*** 4
+** 5
+ * 1
+ ** 2
+ ** 3
+ *** 4
+ ** 5
