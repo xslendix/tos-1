@@ -83,11 +83,11 @@ std::string VFsFileNameAbs(char const* name) {
   std::string ret;
   // thrd_drv is always uppercase
   ret += mount_points[thrd_drv - 'A']; // T
-  ret += delim; // /
+  ret += delim;                        // /
   if (thrd_pwd.size() > 1) {
     ret.pop_back();
     ret += thrd_pwd; // /
-    ret += delim; // /
+    ret += delim;    // /
   }
   ret += name; // Name
   return ret;

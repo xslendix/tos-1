@@ -5,9 +5,9 @@
 using std::ios;
 #include <filesystem>
 namespace fs = std::filesystem;
+#include <iostream>
 #include <memory>
 #include <utility>
-#include <iostream>
 
 #include <signal.h>
 #include <stdint.h>

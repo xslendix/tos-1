@@ -316,7 +316,7 @@ static int64_t IsValidPtr(int64_t* stk) {
 
   // wtf IsBadReadPtr gives me a segfault so i just have to use this
   // polyfill lmfao
-//#ifdef __WINE__
+  // #ifdef __WINE__
   MEMORY_BASIC_INFORMATION mbi = {0};
   if (VirtualQuery((void*)stk[0], &mbi, sizeof(mbi))) {
     // https://archive.md/ehBq4
@@ -328,12 +328,12 @@ static int64_t IsValidPtr(int64_t* stk) {
     return !!(mbi.Protect & mask);
   }
   return 0;
-/*#else
-  return !IsBadReadPtr((void*)stk[0], 8);
-#endif*/
+  /*#else
+    return !IsBadReadPtr((void*)stk[0], 8);
+  #endif*/
 
 #else
-//#ifdef __FreeBSD__
+  // #ifdef __FreeBSD__
   static size_t ps;
   if (!ps)
     ps = getpagesize();
@@ -341,38 +341,38 @@ static int64_t IsValidPtr(int64_t* stk) {
   stk[0] *= ps; // page boundary
   // https://archive.md/Aj0S4
   return -1 != msync((void*)stk[0], ps, MS_ASYNC);
-/*#elif defined(__linux__)
-      // TOO FUCKING GODDAMN SLOW!!!!!
-  auto constexpr Hex2I64 = [](char const *ptr, char const** res) {
-    int64_t ret = 0;
-    char c;
-    while (isxdigit(c = *ptr)) {
-      ret <<= 4;
-      ret |= isalpha(c) ? toupper(c) - 'A' + 10 : c - '0';
-      ++ptr;
+  /*#elif defined(__linux__)
+        // TOO FUCKING GODDAMN SLOW!!!!!
+    auto constexpr Hex2I64 = [](char const *ptr, char const** res) {
+      int64_t ret = 0;
+      char c;
+      while (isxdigit(c = *ptr)) {
+        ret <<= 4;
+        ret |= isalpha(c) ? toupper(c) - 'A' + 10 : c - '0';
+        ++ptr;
+      }
+      if (res)
+        *res = ptr;
+      return ret;
+    };
+    std::ifstream map{"/proc/self/maps", ios::binary | ios::in};
+    std::string s, buffer;
+    while (std::getline(map, buffer))
+      (s += buffer) += '\n';
+    char const *ptr = s.c_str();
+    while (*ptr) {
+      auto lower = Hex2I64(ptr, &ptr);
+      ++ptr; // skip '-'
+      auto upper = Hex2I64(ptr, &ptr);
+      if (lower <= stk[0] && stk[0] <= upper)
+        return 1;
+      ptr = strchr(ptr, '\n');
+      if (ptr == nullptr)
+        return 0;
+      ++ptr; // go to next line
     }
-    if (res)
-      *res = ptr;
-    return ret;
-  };
-  std::ifstream map{"/proc/self/maps", ios::binary | ios::in};
-  std::string s, buffer;
-  while (std::getline(map, buffer))
-    (s += buffer) += '\n';
-  char const *ptr = s.c_str();
-  while (*ptr) {
-    auto lower = Hex2I64(ptr, &ptr);
-    ++ptr; // skip '-'
-    auto upper = Hex2I64(ptr, &ptr);
-    if (lower <= stk[0] && stk[0] <= upper)
-      return 1;
-    ptr = strchr(ptr, '\n');
-    if (ptr == nullptr)
-      return 0;
-    ++ptr; // go to next line
-  }
-  return 0;
-#endif*/
+    return 0;
+  #endif*/
 
 #endif
 }
