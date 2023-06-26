@@ -21,7 +21,7 @@ static struct CDrawWindow {
   ~CDrawWindow() {
     if (!win_init)
       return;
-    // somehow segfaults idk lmao im just gonna just leak memory for a
+    // somehow segfaults idk lmao im just gonna leak memory for a
     // microsecond fuck you
     /*SDL_DestroyCond(screen_done_cond);
     SDL_DestroyMutex(screen_mutex);
@@ -639,11 +639,14 @@ void GrPaletteColorSet(uint64_t i, uint64_t bgr48) {
     return;
   bgr_48 u;
   u.i = bgr48;
+  // clang-format off
   // 0xffff is 100% so 0x7fff/0xffff would be about .50
   // this gets multiplied by 0xff to get 0x7f
-  Uint8 b = u.c.b / (double)0xffff * 0xff, g = u.c.g / (double)0xffff * 0xff,
+  Uint8 b = u.c.b / (double)0xffff * 0xff,
+        g = u.c.g / (double)0xffff * 0xff,
         r = u.c.r / (double)0xffff * 0xff;
-  // i need designated inits now
+  // clang-format on
+  // i seriously need designated inits in c++
   SDL_Color sdl_c;
   sdl_c.r = r;
   sdl_c.g = g;
