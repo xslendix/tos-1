@@ -288,7 +288,7 @@ enum {
 };
 
 // this is templeos' keymap
-static char const keys[] = {
+static char constexpr keys[] = {
     0,   CH_ESC, '1',  '2', '3',  '4', '5', '6', '7', '8', '9', '0', '-',
     '=', '\b',   '\t', 'q', 'w',  'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
     '[', ']',    '\n', 0,   'a',  's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
@@ -297,7 +297,7 @@ static char const keys[] = {
     0,   0,      0,    0,   0,    0,   0,   0,   0,   '-', 0,   '5', 0,
     '+', 0,      0,    0,   0,    0,   0,   0,   0,   0,   0,   0};
 
-inline static int64_t K2SC(char ch) {
+inline static constexpr uint64_t K2SC(char ch) {
   for (size_t i = 0; i != sizeof(keys) / sizeof(*keys); i++) {
     if (keys[i] == ch)
       return i;
@@ -305,7 +305,7 @@ inline static int64_t K2SC(char ch) {
   __builtin_unreachable();
 }
 
-static int32_t __ScanKey(int64_t* ch, int64_t* sc, SDL_Event* ev) {
+static int32_t ScanKey(int64_t* ch, int64_t* sc, SDL_Event* ev) {
   SDL_Event e = *ev;
   int64_t mod = 0;
   if (e.type == SDL_KEYDOWN) {
@@ -523,7 +523,7 @@ static bool kb_init = false;
 static bool ms_init = false;
 static int SDLCALL KBCallback(void* d, SDL_Event* e) {
   int64_t c, s;
-  if (kb_cb && (-1 != __ScanKey(&c, &s, e)))
+  if (kb_cb && (-1 != ScanKey(&c, &s, e)))
     FFI_CALL_TOS_2(kb_cb, c, s);
   return 0;
 }
