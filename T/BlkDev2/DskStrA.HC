@@ -310,7 +310,7 @@ returns default.
     ext=StrNew("");
   while (StrOcc(st,'/')&&!IsDir(st))
     StrLastRem(st,"/");
-//Changed by nroot,I made it this way so "T:/some_file" will strip down to "T:/".
+/*//Changed by me,I made it this way so "T:/some_file" will strip down to "T:/".
 //This is important as EdCodeTools calls this to get the directory name
 //This may make bugs for ultra othodox code,but I think it will fix more bugs
   if(StrLen(st)==2&&st[1]==':') {
@@ -318,6 +318,8 @@ returns default.
     Free(st);
     return st2;
   }
+//meh
+*/
   while (StrOcc(st,'/')) {
     st2=StrNew(st);
     st3=StrNew(st);

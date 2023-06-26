@@ -2,7 +2,7 @@
 /**
  * Type ':JOIN #anonchan' after the Client logs you in
  * Usage ClientNew(hn="chat.freenode.org",port=6667,user_name);
- * Nroot doesn't know how to use IRC so you are on your own
+ * I don't know how to use IRC so you are on your own
  */
 class CClient {
   CDyadStream *srv;

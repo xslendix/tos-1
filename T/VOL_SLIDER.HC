@@ -1,5 +1,4 @@
 
-//This stuff is by Nroot.
 //It's a volume slider that will run in the WallPaper.HC.Z
 U0 DrawVolumeSlider(CDC *dc , CCtrl *vol) {
   CD3I32 triangle[4];

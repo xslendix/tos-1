@@ -36,12 +36,12 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0,CTask *mem_task=NULL)
     f->flags=f->flags|FF_WRITE|FF_NEEDS_WRITE;
     if (StrOcc(flags,'+')) {
       if (FileFind(full_name,&f->de,FUF_JUST_FILES)) {
-//Nroot's edit
+//Modified for emul
         if(Let2BlkDevType(*full_name)==BDT_VIRT) {
 	  dirc=DirContextNew(full_name);
 	  VFsSetDrv(Fs->cur_dv->drv_let);
 	  VFsSetPwd(Fs->cur_dir);
-	  f->_3days_virt=VFsFOpenW(&f->de.name);
+	  f->_file_virt=VFsFOpenW(&f->de.name);
 	  DirContextDel(dirc);
         }
 //
@@ -57,7 +57,7 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0,CTask *mem_task=NULL)
     if (dirc=DirContextNew(full_name)) {
       StrCpy(f->de.name,dirc->mask);
       if (cnt>0) {//We pre-alloc the whole thing.
-//Nroot was here
+//Modified for emul
         if(Let2BlkDevType(*full_name)!=BDT_VIRT) {
 	  f->de.clus=ClusAlloc(f->dv,0,
 	        (cnt+f->dv->spc-1)/f->dv->spc,contiguous);
@@ -67,10 +67,10 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0,CTask *mem_task=NULL)
         f->flags&=~FF_NEW_FILE;
 
       }
-//Nroot's edit
+//Modified for emul
       if(Let2BlkDevType(*full_name)==BDT_VIRT) {
         VFsSetPwd(Fs->cur_dir);
-        f->_3days_virt=VFsFOpenW(&f->de.name);
+        f->_file_virt=VFsFOpenW(&f->de.name);
       }
 //
       DirContextDel(dirc);
@@ -78,11 +78,11 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0,CTask *mem_task=NULL)
     }
   } else {
     if (FileFind(full_name,&f->de,FUF_JUST_FILES)) {
-//Nroot's edit
+//Modified for emul
       if(Let2BlkDevType(*full_name)==BDT_VIRT) {
         dirc=DirContextNew(full_name);
         VFsSetPwd(Fs->cur_dir);
-        f->_3days_virt=VFsFOpenR(&f->de.name);
+        f->_file_virt=VFsFOpenR(&f->de.name);
         DirContextDel(dirc);
       }
 //
@@ -101,8 +101,8 @@ CFile *FOpen(U8 *filename,U8 *flags,I64 cnt=0,CTask *mem_task=NULL)
 {//Close CFile, updating directory.
   CDirContext *dirc;
   if (f) {
-    if(f->_3days_virt) {
-      VFsFClose(f->_3days_virt);
+    if(f->_file_virt) {
+      VFsFClose(f->_file_virt);
       if (dirc=DirContextNew(f->de.full_name)) {
         VFsSetDrv(Fs->cur_dv->drv_let);
         VFsSetPwd(Fs->cur_dir); //+2 to ingore T:
@@ -166,12 +166,12 @@ I64 FSetClus(CFile *f,I64 c,I64 blk,Bool read)
 
 Bool FBlkRead(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 {//Read [nth,n+cnt) blks of file.
-  if(f->_3days_virt) {
+  if(f->_file_virt) {
     if (blk==FFB_NEXT_BLK) 
       blk=f->fblk_num;
-    VFsFSeek(blk<<BLK_SIZE_BITS,f->_3days_virt);
+    VFsFSeek(blk<<BLK_SIZE_BITS,f->_file_virt);
     f->fblk_num=blk+cnt;
-    return VFsFBlkRead(buf,1<<BLK_SIZE_BITS,cnt,f->_3days_virt);
+    return VFsFBlkRead(buf,1<<BLK_SIZE_BITS,cnt,f->_file_virt);
   }
   CDrv *dv=f->dv;
   I64 spc=dv->spc,i,j,c=f->de.clus;
@@ -225,11 +225,11 @@ Bool FBlkRead(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 
 Bool FBlkWrite(CFile *f,U8 *buf,I64 blk=FFB_NEXT_BLK,I64 cnt=1)
 {//Write [nth,n+cnt) blks of file.
-  if(f->_3days_virt) {
+  if(f->_file_virt) {
     if(blk==FFB_NEXT_BLK)
       blk=f->fblk_num;
-    VFsFSeek(blk<<BLK_SIZE_BITS,f->_3days_virt);
-    VFsFBlkWrite(buf,1<<BLK_SIZE_BITS,cnt,f->_3days_virt);
+    VFsFSeek(blk<<BLK_SIZE_BITS,f->_file_virt);
+    VFsFBlkWrite(buf,1<<BLK_SIZE_BITS,cnt,f->_file_virt);
     blk+=cnt;
     f->fblk_num=blk;
     if (f->de.size<blk<<BLK_SIZE_BITS)

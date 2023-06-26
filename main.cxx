@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
       HCRTArg = arg_file0("f", "file", nullptr,
                           "Specifies where your HolyC runtime is"),
       TDriveArg = arg_file0("t", nullptr, "T(boot) Drive",
-                            "This tells 3days where to "
+                            "This tells the emulator where to "
                             "use(or create) the boot "
                             "drive folder."),
       cmdLineFiles = arg_filen(nullptr, nullptr, "<files>", 0, 100,

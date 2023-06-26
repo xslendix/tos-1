@@ -26,7 +26,7 @@ public U0 BootDVDIns(U8 *dst_loc,U8 drv_let=0)
 {//See $LK,"::/Misc/DoDistro.HC"$.
   try {
     MakeAll(dst_loc);
-//Nroot here,Move(tmp,BOOT_DIR_KERNEL_BIN_C);I will move this later in DoDistro.HC
+//Move(tmp,BOOT_DIR_KERNEL_BIN_C);I will move this later in DoDistro.HC
   } catch {
     PutExcept;
     Beep;

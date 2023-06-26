@@ -1,6 +1,6 @@
 {no-toc}
-==Welcome to the Offical 3Days wiki
-This website is about 3Days which is an implementation of a TempleOS runtime under Linux,Windows/FreeBSD. Code here should work under TempleOS also. Here are some links to get started,but this website is still under construction. If you want to Contibute,you'll have to ask *nrootconauto@gmail.com* as this server is under development. 
+==Welcome to documentation for this TempleOS emulator
+This website is about the software this wiki is running on which is an implementation of a TempleOS runtime under Linux,Windows and FreeBSD. Code here should work also under TempleOS. Here are some links to get started,but this website is still under construction. If you want to Contibute,you'll have to ask *enzymical@duck.com* as this server is under development. 
 
 * [WikiHome Home]
 * Topics

@@ -139,7 +139,7 @@ Waiting for a job can get boring,and when you want to have tons of jobs running,
  //We will store the current job count in i,but i'll decrease it every 
  //time a job completes.
  //We will scan the job's for a result and when they all end i will be
- // 0 so we'll exit the silly sauce
+ //0 so we'll exit the loop
  i=JOB_CNT;
  I64 result;
  while(i) {

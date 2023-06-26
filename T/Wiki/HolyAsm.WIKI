@@ -13,7 +13,7 @@ In X86_64 assembly,you can set a registers value with *MOV*. RAX is the return r
  _extern _HELLO I64 Hello();
  "Hello returns %d\n",Hello;
 
-+INT3 WILL TRIGGER A DEBUGGER IN 3DAYS+
++INT3 WILL TRIGGER A DEBUGGER IN THIS EMULATOR+
 
 * DFs is the debugged task,and you can view *RAX* in the /->rax/ member
 
@@ -204,7 +204,7 @@ asm {
 
 It get's strange with the 8bit parts. All of the 64bit normal registers have 8bit versions,+but AX/BX/CX/DX have the upper 8 bits avaible as AH/BH/CH/DH(the H is for high)+. 
 
-Here is a table to clear up some silly sauce
+Here is a table to clear up info
 
 [rax_dia.jpeg]
 (Writing into eax will zero the upper 32bits of RAX)

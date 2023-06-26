@@ -1,5 +1,5 @@
 ==Getting started with HolyC development
-HolyC is currently available on all machines that could emulate an IA64 generic machine, or through a binary translation layer for IA64 FreeBSD/Linux/Windows, and a !PowerPC port is being considered. Alternatively you may run TempleOS on bare metal using !TinkerOS.
+HolyC is currently available on all machines that could emulate an AMD64 generic machine, or through a binary translation layer for AMD64 FreeBSD/Linux/Windows, and a !PowerPC port is being considered. Alternatively you may run TempleOS on bare metal using !TinkerOS.
 
 ==Running a HolyC environment
 ===Virtual machine
@@ -17,12 +17,12 @@ For Linux QEMU is highly recommended.
                     -rtc base=localtime \
                     -soundhw pcspk
 For Windows, !VMWare Workstation is highly recommended. Keep in mind you /must/ disable anything Hyper-V related(Virtual machine platform, Hyper-V, Windows Subsystem for Linux) or else !VMWare Workstation will perform very poorly because it becomes a Hyper-V wrapper instead of using its own hypervisor. !VMWare Workstation 16.0.0 supports !PCSpeaker emulation. 16.2.3 has a hypervisor bug. Make sure you choose 'Compatible with Workstation 8.x' in the custom configuration menu.
-===!3Days(binary translation layer)
-!3Days is a binary translation layer for Linux, !FreeBSD and Windows to run a full-blown TempleOS environment in userspace without emulation. It is currently only available for !IA64 FreeBSD/Linux/Windows. PowerPC support is being considered, but not in the near future.
+===!This emulator(binary translation layer)
+!This emulator is a binary translation layer for Linux, !FreeBSD and Windows to run a full-blown TempleOS environment in userspace without emulation. It is currently only available for !AMD64 FreeBSD/Linux/Windows.
 
-!3Days development is still in progress, but it will (hopefully) be able to execute all source code in this Wiki without problems. Please contact the code or it fails to run.
+!Development is still in progress, but it will (hopefully) be able to execute all source code in this Wiki without problems. Please contact the owner if it fails to run.
 
 ===Bare metal
-While TempleOS can be booted on any generic PC with BIOS boot, an !IA64 CPU, an IDE CDROM, and an IDE hard drive, and a 640x480 4:3 display, it is not easy to find a machine that fits all these requirements. The closest machine to this is the !ThinkPad T60 with a 4:3 screen.
+While TempleOS can be booted on any generic PC with BIOS boot, an !AMD64 CPU, an IDE CDROM, and an IDE hard drive, and a 640x480 4:3 display, it is not easy to find a machine that fits all these requirements. The closest machine to this is the !ThinkPad T60 with a 4:3 screen.
 
 With !TinkerOS, this could be partially solved. !TinkerOS supports multiple display resolutions, and can boot on !PCs that do not have a CDROM or an IDE hard drive. !TinkerOS has been bare metal tested on a !ThinkPad X200 with compatibility mode turned on for emulating an IDE hard drive for installation. You can download the USB boot image from [https://github.com/tinkeros/tinkeros/releases here]. Keep in mind that it still needs CSM or BIOS boot in order to boot.

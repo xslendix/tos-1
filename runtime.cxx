@@ -305,7 +305,7 @@ static void STK_UnblockSignals() {
 #endif
 }
 
-static void STK__3DaysGrPaletteColorSet(int64_t* stk) {
+static void STK__GrPaletteColorSet(int64_t* stk) {
   GrPaletteColorSet(stk[0], stk[1]);
 }
 
@@ -334,7 +334,7 @@ static int64_t IsValidPtr(int64_t* stk) {
 
 #else
   // #ifdef __FreeBSD__
-  static size_t ps;
+  static size_t ps = 0;
   if (!ps)
     ps = getpagesize();
   stk[0] /= ps; // align to
@@ -356,20 +356,14 @@ static int64_t IsValidPtr(int64_t* stk) {
       return ret;
     };
     std::ifstream map{"/proc/self/maps", ios::binary | ios::in};
-    std::string s, buffer;
-    while (std::getline(map, buffer))
-      (s += buffer) += '\n';
-    char const *ptr = s.c_str();
-    while (*ptr) {
+    std::string buffer;
+    while (std::getline(map, buffer)) {
+      char const* ptr = buffer.data();
       auto lower = Hex2I64(ptr, &ptr);
       ++ptr; // skip '-'
       auto upper = Hex2I64(ptr, &ptr);
       if (lower <= stk[0] && stk[0] <= upper)
         return 1;
-      ptr = strchr(ptr, '\n');
-      if (ptr == nullptr)
-        return 0;
-      ++ptr; // go to next line
     }
     return 0;
   #endif*/
@@ -491,11 +485,8 @@ int64_t STK___GetStr(int64_t* stk) {
   return (int64_t)r;
 }
 
-int64_t STK_GetClipboardText(int64_t* stk) {
-  char* r = ClipboardText();
-  char* r2 = HolyStrDup(r);
-  free(r);
-  return (int64_t)r2;
+char* STK_GetClipboardText(int64_t* stk) {
+  return HolyStrDup(ClipboardText().c_str());
 }
 
 int64_t STK_FUnixTime(int64_t* stk) {
@@ -650,17 +641,21 @@ static void RegisterFunctionPtr(std::string& blob, char const* name, void* fp,
                                 size_t arity) {
   auto sz = blob.size();
 #ifdef _WIN32
+  // clang-format off
   /*
   PUSH RBP
   MOV RBP,RSP
   AND RSP,-0x10
   PUSH R10
   PUSH R11
-  SUB RSP,0x20 //Manditory 4 stack
-  arguments must be "pushed" LEA
-  RCX,[RBP+8+8] PUSH R9 PUSH R8 PUSH RDX
+  SUB RSP,0x20 //Mandatory 4 stack arguments must be "pushed"
+  LEA RCX,[RBP+8+8]
+  PUSH R9
+  PUSH R8
+  PUSH RDX
   PUSH RCX
    */
+  // clang-format on
   char const* atxt = "\x55\x48\x89\xE5"
                      "\x48\x83\xE4\xF0"
                      "\x41\x52\x41\x53"
@@ -670,24 +665,26 @@ static void RegisterFunctionPtr(std::string& blob, char const* name, void* fp,
                      "\x52\x51";
   blob.append(atxt, 26);
 #else
+  // clang-format off
   /*
-PUSH RBP
-MOV RBP,RSP //RBP will have point to the old RBP,as we just PUSHed it(We moved
-the pointer to the old RBP to the current RBP)
-//-0x10 =0xffffffffff0,16 is 0b1111 and AND ing will move the stack down to an
-alignment of 16(it chops off the bits) AND RSP,-0x10 //This will align the
-stack to 16
-//SysV OS will save R12-15 which are needed,but TempleOS needs to save
-RSI,RDI,R10-15
-// PUSH RSI PUSH RDI PUSH R10 PUSH R11
+  PUSH RBP
+  MOV RBP,RSP //RBP will have point to the old RBP,as we just PUSHed it(We moved the pointer to the old RBP to the current RBP)
+              //-0x10 =0xffffffffff0,16 is 0b1111 and AND ing will move the stack
+              //down to an alignment of 16(it chops off the bits)
+  AND RSP,-0x10 //This will align the stack to 16
+                //SysV OS will save R12-15 which are needed,but TempleOS needs to save
+                //RSI,RDI,R10-15
+  PUSH RSI
+  PUSH RDI
+  PUSH R10
+  PUSH R11
 //Load Effective Address
 // RBP+16 This is where TempleOS puts the argument
-// RBP+8 the return address(When you CALL a function,it pushes the return
-address(RIP) to the stack)
+// RBP+8 the return address(When you CALL a function,it pushes the return address(RIP) to the stack)
 // RBP+0 The old RBP
-LEA RDI,[RBP+8+8] RDI=&RBP+8+8 Because at RBP+16 we have the first stack
-argument
+  LEA RDI,[RBP+8+8] //RDI=&RBP+8+8 Because at RBP+16 we have the first stack argument
  */
+  // clang-format on
   char const* atxt = "\x55\x48\x89\xE5"
                      "\x48\x83\xE4\xF0"
                      "\x56\x57\x41\x52"
@@ -720,17 +717,15 @@ argument
   POP R10
   POP RDI
   POP RSI
-  //This instruction will move RSP to the old base ptr and POP RBP
-  //It is the same as this
-  //   MOV RSP,RBP //Our old RBP address on the stack
-  //   POP RBP
-  LEAVE
+  LEAVE //This instruction will move RSP to the old base ptr and POP RBP
+        //It is the same as this
+        //   MOV RSP,RBP //Our old RBP address on the stack
+        //   POP RBP
   */
   atxt = "\xFF\xD0\x41\x5B"
 	 "\x41\x5A\x5F\x5E"
 	 "\xC9";
   blob.append(atxt, 9);
-  // clang-format on
 #endif
   // RET1 will pop the old return address from the stack,AND it will remove the
   // arguments' off the stack
@@ -738,7 +733,19 @@ argument
   // POP RIP
   // ADD RSP,cnt //Remove cnt bytes from the stack
   //
-  // RET1 ARITY*8
+  // RET1 ARITY*8 (8 == sizeof(uint64_t))
+  // HolyC ABI is __stdcall, the callee cleans up its own stack
+  // unless its variadic
+  //
+  // A bit about HolyC ABI: all args are 8 bytes(64 bits)
+  // let there be function Foo(I64 i, ...);
+  // Foo(2, 4, 5, 6)
+  //   argv[2] 6
+  //   argv[1] 5
+  //   argv[0] 4
+  //   i  2
+  //   argc 3(num of varargs) // RBP + 16(this is where the stack starts)
+  // clang-format on
   blob.push_back('\xc2');
   arity *= 8;
   // Arity is 16bits in the instrction(64 kilobytes of arguments and below ONLY)
@@ -759,7 +766,6 @@ void RegisterFuncPtrs() {
   R_("NewVirtualChunk", STK_NewVirtualChunk, 2);
   R_("FreeVirtualChunk", STK_FreeVirtualChunk, 2);
   R_("__CmdLineBootText", CmdLineBootText, 0);
-  R_("Exit3Days", STK_ExitTOS, 1);
   R_("ExitTOS", STK_ExitTOS, 1);
   R_("__GetStr", STK___GetStr, 1);
   R_("__IsCmdLine", IsCmdLine, 0);
@@ -835,7 +841,7 @@ void RegisterFuncPtrs() {
   R_("GetVolume", STK_GetVolume, 0);
   R_("SetVolume", STK_SetVolume, 1);
   R_("__GetTicksHP", STK__GetTicksHP, 0);
-  R_("_3DaysGrPaletteColorSet", STK__3DaysGrPaletteColorSet, 2);
+  R_("_GrPaletteColorSet", STK__GrPaletteColorSet, 2);
   R_("UVBufBase", STK_UVBufBase, 1);
   R_("UVBufLen", STK_UVBufLen, 1);
   R_("UVRandom", STK_UVRandom, 6);

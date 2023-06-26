@@ -42,14 +42,14 @@ public U0 GrPaletteSet(CBGR48 *bgr48)
   I64 i;
   for (i=0;i<COLORS_NUM;i++) {
     pal[i]=bgr48[i];
-    _3DaysGrPaletteColorSet(i,bgr48[i]);
+    _GrPaletteColorSet(i,bgr48[i]);
   }
 }
 
 public U0 GrPaletteColorSet(I64 color,CBGR48 bgr48)
 {//16 colors
   pal[color]=bgr48;
-  _3DaysGrPaletteColorSet(color,bgr48);
+  _GrPaletteColorSet(color,bgr48);
 }
 
 

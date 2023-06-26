@@ -1,4 +1,4 @@
-I64 scrn_lock=0; //Added by nroot;
+I64 scrn_lock=0; //Added to remove screen flickering
 
 //Uses $LK,"fixed-point",A="FI:::/Demo/Lectures/FixedPoint.HC"$.
 

@@ -1,13 +1,10 @@
-;Poo Poo FFI for SystemV to TempleOS
-;
 ; Push arguments as normal
-;
 GLOBAL FFI_CALL_TOS_0
 FFI_CALL_TOS_0:
 PUSH RBP
-MOV RBP,RSP
-PUSH RBX
-CALL RDI
+MOV RBP,RSP;save current stack
+PUSH RBX;register that must be saved
+CALL RDI;1st arg
 POP RBX
 LEAVE
 RET
@@ -18,7 +15,7 @@ FFI_CALL_TOS_1:
 PUSH RBP
 MOV RBP,RSP
 PUSH RBX
-PUSH RSI
+PUSH RSI;2nd arg
 CALL RDI
 POP RBX
 LEAVE

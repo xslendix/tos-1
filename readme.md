@@ -1,11 +1,12 @@
 # templeos in ring 3
+### you should already know the basics of templeos before attempting to use this
 
 # building
 ## windows users
 ### support only for >=Win10, msvc unsupported
 install msys2, launch the "MSYS2 MINGW64 Shell", and run the following
 ```
-pacman -Syu make yasm mingw-w64-x86_64-{clang,SDL2,cmake,libuv}
+pacman -Syu make yasm mingw-w64-x86_64-{gcc,SDL2,cmake,libuv}
 ```
 ## unix-like system users
 install SDL2, cmake, make, yasm, gcc/clang(clang preferred) and libuv
@@ -28,7 +29,7 @@ mv T/HCRT.BIN .
 ```
 # caveat
 due to running in userspace, context switching is around 4 times slower <br>
-division by zero is not an exception, it will bring up the debugger
+division by zero is not an exception, it will bring up the debugger(SIGFPE)
 
 # documentation
 ```C
@@ -44,6 +45,8 @@ DirMk("folder");
 Dir;
 Dir("fold*");//supports wildcards
 Cd("folder");
+Man("Ed");
+Ed("a.HC");
 Find("str",,"-i");//grep -rn . -e str
 FF("file.*");//find .|grep file
 Unzip("file.HC.Z");//unzip tos compression

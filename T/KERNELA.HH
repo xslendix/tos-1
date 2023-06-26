@@ -1,9 +1,9 @@
 // Main TempleOS header
 //
-// These are modified for 3Days; they dont take CTask * as an argument
+// These are modified for this emulator; they dont take CTask * as an argument
 //
 #define __TOS_EMUL__ TRUE
-extern class C3DaysDrawWin;
+extern class CDrawWin;
 extern class CTask;
 extern class CFile;
 #define FFB_NEXT_BLK		0x7FFFFFFFFFFFFFFF
@@ -149,7 +149,7 @@ extern class CUVInterfaceAddr;*/
 extern class CUVRandom;
 extern class CUVLoop;
 #ifdef IMPORT_BUILTINS
-import U0 _3DaysGrPaletteColorSet(I64i,I64i);
+import U0 _GrPaletteColorSet(I64i,I64i);
 import U0 __SleepHP(I64i);
 import U0 __AwakeCore(I64i);
 import U0 SetVolume(F64);
@@ -202,7 +202,6 @@ import CTask* GetFs();
 import CCPU *GetGs();
 import U0 SetGs(CCPU *);
 import U0i FreeTaskMem(CTask*);
-import U0i Exit3Days(I32i ec=0);
 import U0i ExitTOS(I32i ec=0);
 import I64i __IsCmdLine();
 import U8i __FExists(U8i *);
@@ -223,9 +222,9 @@ public import U0i TOSPrint(U8i *,...);
 public import U8 *__GetStr(U8 *pmt="");
 import U0i SndFreq(I64i freq);
 import U0 __BootstrapForeachSymbol(U0 *fptr);
-extern C3DaysDrawWin;
-import C3DaysDrawWin *DrawWindowNew();
-import U0i DrawWindowUpdate(C3DaysDrawWin *win,U8i *,I64i,I64i);
+extern CDrawWin;
+import CDrawWin *DrawWindowNew();
+import U0i DrawWindowUpdate(CDrawWin *win,U8i *,I64i,I64i);
 import I64i __ScanKey(I64i *ch,I64i *sc);
 import I64i __WaitKey(I64i *ch,I64i *sc);
 import I64i __GetTicks();
@@ -300,7 +299,6 @@ extern CTask* GetFs();
 extern CCPU *GetGs();
 extern U0i FreeTaskMem(CTask*);
 extern U8i *__CmdLineBootText();
-extern U0i Exit3Days(I32i ec=0);
 extern U0i ExitTOS(I32i ec=0);
 extern I64i __IsCmdLine();
 extern U8i __FExists(U8i *);
@@ -323,8 +321,8 @@ public extern U0 Exit();
 public extern U8 *__GetStr(U8 *pmt="");
 extern U0 __SetThreadPtr(U0 *_3dt,U8 *ptr);
 extern U0 __BootstrapForeachSymbol(U0 *fptr);
-extern C3DaysDrawWin *DrawWindowNew();
-extern U0i DrawWindowUpdate(C3DaysDrawWin *win,U8i *,I64i,I64i);
+extern CDrawWin *DrawWindowNew();
+extern U0i DrawWindowUpdate(CDrawWin *win,U8i *,I64i,I64i);
 extern I64i __ScanKey(I64i *ch,I64i *sc);
 extern I64i __WaitKey(I64i *ch,I64i *sc);
 extern I64i __GetTicks();
@@ -2823,7 +2821,7 @@ class CISOPriDesc
 #define MT_DVD		2
 
 //CDirEntry flags (Used by \dLK,"FileMgr",A="MN:FileMgr"\d())
-#define CDIR_FILENAME_LEN	38 //Must include terminator zero
+#define CDIR_FILENAME_LEN	101 //Must include terminator zero
 public class CDirEntry
 {
   CDirEntry *next,*parent,*sub;
@@ -3071,7 +3069,7 @@ public class CFile //See \dLK,"::/Demo/Dsk/DataBase.HC"\d.
   CDrv	*dv;
   I64	fblk_num,clus,file_clus_num,max_blk;
   U8	*clus_buf;
-  U8	*_3days_virt; //points to FILE * from C
+  U8	*_file_virt; //points to FILE * from C
 };
 
 #define _CFG_HEAP_DBG FALSE
@@ -3392,7 +3390,7 @@ class CBpt
   CBpt	*next;
   U8	*addr,
 	val,
-	is_tmp, //Changed by nroot
+	is_tmp, //Changed in this emul
 	pad[6];
 };
 
@@ -3520,7 +3518,7 @@ public class CTaskSettings
 #define TASKf_KILL_AFTER_DBG	13
 
 #define TASKf_NONTIMER_RAND	14
-//Added by nroot
+//Added in this emul
 #define TASKf_JUST_STEPPED 15
 
 //CTask.display_flags
@@ -3594,7 +3592,7 @@ public class CTask //The Fs segment reg points to current CTask.
 	text_attr,border_attr;
   U16	win_z_num,pad;
 
-  U8 *stk; //CHANGED from CTaskStk to U8 * by nroot
+  U8 *stk; //CHANGED from CTaskStk to U8*
 
   CExcept *next_except,*last_except;
   I64	except_rbp,	//throw routine's RBP

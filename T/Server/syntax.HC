@@ -35,7 +35,7 @@ U0 HighlightToHtml(CDyadStream *s,I64 len,U8 *src,I64 *state) {
     }
   }
   try {
-    CCmpCtrl *cctrl=CmpCtrlNew(src,CCF_NO_DEFINES|CCF_DONT_FREE_BUF,"SillySauce");   
+    CCmpCtrl *cctrl=CmpCtrlNew(src,CCF_NO_DEFINES|CCF_DONT_FREE_BUF,"WikiParser");   
 loop:
     src=t3=t2=cctrl->cur_buf_ptr;
     while(Bt(char_bmp_white_space,*t2)||*t2=='#') {

@@ -20,12 +20,15 @@ static struct CDrawWindow {
   ~CDrawWindow() {
     if (!win_init)
       return;
-    SDL_FreeSurface(surf);
-    SDL_FreePalette(palette);
-    SDL_DestroyWindow(window);
+    // somehow segfaults idk lmao im just gonna just leak memory for a
+    // microsecond fuck you
+    /*SDL_DestroyCond(screen_done_cond);
     SDL_DestroyMutex(screen_mutex);
-    SDL_DestroyCond(screen_done_cond);
-    SDL_DestroyRenderer(rend);
+    SDL_FreePalette(palette);
+    SDL_FreeSurface(surf);
+    SDL_DestroyRenderer(rend);*/
+    SDL_DestroyWindow(window);
+    SDL_Quit();
   }
 } win;
 
@@ -37,27 +40,22 @@ void SetClipboard(char const* text) {
   SDL_SetClipboardText(text);
 }
 
-char* ClipboardText() {
-  char *sdl = SDL_GetClipboardText(), *r;
-  if (!sdl)
-    return strdup("");
-  r = strdup(sdl);
-  SDL_free(sdl);
+std::string const ClipboardText() {
+  char* s = SDL_GetClipboardText();
+  if (s == nullptr)
+    return {};
+  std::string sdl_clip = s;
+  SDL_free(s);
   if (sanitize_clipboard) {
-    size_t cur_pos = 0, chunk_pos = 0;
-    while (r[cur_pos]) {
-      // accounts for weird dot space
-      // character
-      if (' ' - 1 <= r[chunk_pos])
-        ++chunk_pos;
-      else if (chunk_pos != cur_pos)
-        r[cur_pos++] = r[chunk_pos++];
-      else
-        ++chunk_pos, ++cur_pos;
+    /*std::erase_if(sdl_clip, [](char c) {
+      return ' ' - 1 > c;
+    }); C++20*/
+    for (size_t i = 0; i < sdl_clip.size(); ++i) {
+      if (' ' - 1 > sdl_clip[i])
+        sdl_clip.erase(i, 1);
     }
-    r[cur_pos] = 0;
   }
-  return r;
+  return sdl_clip;
 }
 
 CDrawWindow* NewDrawWindow() {
@@ -614,20 +612,30 @@ void InputLoop(bool* off) {
   }
 }
 
+// please policeman am i being arrested? i want my rights!
+union bgr_48 {
+  struct __attribute__((packed)) {
+    uint16_t b, g, r, pad;
+  } c;
+  uint64_t i;
+};
+
 void GrPaletteColorSet(uint64_t i, uint64_t bgr48) {
   if (!win_init)
     return;
+  bgr_48 u;
+  u.i = bgr48;
   // 0xffff is 100% so 0x7fff/0xffff would be about .50
   // this gets multiplied by 0xff to get 0x7f
-  Uint8 b = (bgr48 & 0xffff) / (double)0xffff * 0xff,
-        g = ((bgr48 >> 16) & 0xffff) / (double)0xffff * 0xff,
-        r = ((bgr48 >> 32) & 0xffff) / (double)0xffff * 0xff;
-  SDL_Color c;
-  c.r = r;
-  c.g = g;
-  c.b = b;
-  c.a = 0xff;
+  Uint8 b = u.c.b / (double)0xffff * 0xff, g = u.c.g / (double)0xffff * 0xff,
+        r = u.c.r / (double)0xffff * 0xff;
+  // i need designated inits now
+  SDL_Color sdl_c;
+  sdl_c.r = r;
+  sdl_c.g = g;
+  sdl_c.b = b;
+  sdl_c.a = 0xff;
   // set column
   for (int repeat = 0; repeat < 256 / 16; ++repeat)
-    SDL_SetPaletteColors(win.palette, &c, i + repeat * 16, 1);
+    SDL_SetPaletteColors(win.palette, &sdl_c, i + repeat * 16, 1);
 }

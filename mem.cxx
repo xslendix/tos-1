@@ -52,6 +52,8 @@ void* NewVirtualChunk(size_t sz, bool low32) {
   if (pad)
     pad = ps;
   if (low32) { // code heap
+    // sz / ps * ps seems meaningless but its actually aligning sz to ps(page
+    // size)
     ret = mmap(nullptr, sz / ps * ps + pad, PROT_EXEC | PROT_WRITE | PROT_READ,
                MAP_PRIVATE | MAP_ANON | MAP_32BIT, -1, 0);
 #ifdef __linux__
@@ -59,24 +61,19 @@ void* NewVirtualChunk(size_t sz, bool low32) {
     if (ret == MAP_FAILED) {
       auto down = reinterpret_cast<char*>((uintptr_t)0x10000);
       std::ifstream map{"/proc/self/maps", ios::binary | ios::in};
-      std::string s, buffer;
-      while (std::getline(map, buffer))
-        (s += buffer) += '\n';
-      int64_t len;
-      const char* ptr = s.c_str();
-      while (true) {
+      std::string buffer;
+      while (std::getline(map, buffer)) {
+        char const* ptr = buffer.data();
         auto lower = (char*)Hex2I64(ptr, &ptr);
+        // basically finds a gap between the previous line's upper address
+        // and the current line's lower address so it can allocate there
         if ((lower - down) >= (sz / ps * ps + pad) && lower > down) {
           goto found;
         }
-        // Ignore '-'
+        // ignore '-'
         ++ptr;
         auto upper = (char*)Hex2I64(ptr, &ptr);
         down = upper;
-        ptr = strchr(ptr, '\n');
-        if (ptr == nullptr) // end of file but still not found
-          break;
-        ++ptr; // go to next line(ptr is at '\n')
       }
     found:
       ret = mmap(down, sz / ps * ps + pad, PROT_EXEC | PROT_WRITE | PROT_READ,

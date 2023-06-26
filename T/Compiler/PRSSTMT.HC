@@ -23,7 +23,7 @@ CHashClass *PrsClass(CCmpCtrl *cc,I64 keyword,I64 fsp_flags,Bool is_extern)
 	UnusedExternWarning(cc,tmpc);
     }
     if (tmpc) {
-// Changed by nroot,Dont let re-externs overide src_link to original value
+// Dont let re-externs overide src_link to original value
       if(tmpc->flags&(1<<Cf_EXTERN)) {
         Free(tmpc->src_link);
         tmpc->src_link=NULL;
@@ -41,14 +41,14 @@ CHashClass *PrsClass(CCmpCtrl *cc,I64 keyword,I64 fsp_flags,Bool is_extern)
     if (fsp_flags&FSF_PUBLIC)
       tmpc->type|=HTF_PUBLIC;
     tmpc->use_cnt=0;
-//Changed by nroot,see above note
+//see above note
     if(!tmpc->src_link) {
       if (cc->last_U16=='\n')
         HashSrcFileSet(cc,tmpc,-1);
       else
         HashSrcFileSet(cc,tmpc,0);
     } else if(!tmpc->idx) {
-//In 3Days,Help index info is put in PUBLIC.HC so we should update it
+//In this emulator,Help index info is put in PUBLIC.HC so we should update it
       if (cc->cur_help_idx && *cc->cur_help_idx)
         tmpc->idx=StrNew(cc->cur_help_idx);
     }
@@ -93,7 +93,7 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,CHashClass *tmp_return,
     tmpf=NULL;
   if (tmpf) {
     tmpf->used_reg_mask=REGG_CLOBBERED+REGG_SAVED+REGG_STK_TMP;
-// Changed by nroot,Dont let re-externs overide src_link to original value
+// Dont let re-externs overide src_link to original value
     if(tmpf->flags&(1<<Cf_EXTERN)) {
       Free(tmpf->src_link);
       tmpf->src_link=NULL;
@@ -125,11 +125,11 @@ CHashFun *PrsFunJoin(CCmpCtrl *cc,CHashClass *tmp_return,
   BEqu(&tmpf->type,HTf_PUBLIC,fsp_flags&FSF_PUBLIC);
   tmpf->return_class=tmp_return;
   tmpf->use_cnt=0;
-//Changed by nroot,see above note
+//see above note
   if(!tmpf->src_link) {
     HashSrcFileSet(cc,tmpf);
   } else if(!tmpf->idx) {
-//In 3Days,Help index info is put in PUBLIC.HC so we should update it
+//In this emulator,Help index info is put in PUBLIC.HC so we should update it
     if (cc->cur_help_idx && *cc->cur_help_idx)
       tmpf->idx=StrNew(cc->cur_help_idx);
   }

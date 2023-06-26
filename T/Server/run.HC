@@ -1,6 +1,6 @@
 Cd("T:/");; //We are not serving from RootFS
 Cd("/Server");;
-#define WIKI_ADMIN_EMAILS "nrootconauto@gmail.com"
+#define WIKI_ADMIN_EMAILS "enzymical@duck.com"
 #define WIKI_SERVER_PORT 8080
 
 U0 ServerYield() {

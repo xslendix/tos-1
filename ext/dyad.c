@@ -531,7 +531,7 @@ static void stream_handleReceivedData(dyad_Stream *stream) {
 		  e.data = stream->lineBuffer.data;
 		  e.size = stream->lineBuffer.length-1;
 		  stream_emitEvent(stream, &e);
-		  stream->lineBuffer.length=0; //Added by nroot(we want to not repeat the data later)
+		  stream->lineBuffer.length=0; //Changed line(we want to not repeat the data later)
       }
       return;
     }

@@ -2,9 +2,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string>
 
 void SetClipboard(char const* text);
-char* ClipboardText();
+std::string const ClipboardText();
 struct CDrawWindow;
 CDrawWindow* NewDrawWindow();
 void DrawWindowUpdate(CDrawWindow* w, int8_t* colors, int64_t internal_width,

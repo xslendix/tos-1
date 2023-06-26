@@ -698,7 +698,7 @@ lex_float_start:
 	  case KW_INCLUDE:
 	    if (Lex(cc)!=TK_STR)
 	      goto lex_end;
-	    fbuf=ExtDft(cc->cur_str,"HC"); //3Days will check for .Z automatically
+	    fbuf=ExtDft(cc->cur_str,"HC"); //Will check for .Z automatically
 	    buf2=FileNameAbs(fbuf);
 	    Free(fbuf);
 	    if (1)

@@ -48,7 +48,7 @@ inv_file:
   Cd(path);
   BootDVDIns("::/Distro");
   CopyDrv2Drv(drv1,"/*",':',"/Distro");
-  //Del("/Distro/" KERNEL_BIN_C); Nroot here,Why are we delting the bin???
+  //Del("/Distro/" KERNEL_BIN_C); Why are we delting the bin Terry???
 
   CopyTreeDrv2Drv(drv1,"/*",':',"/Distro");
   CopyTreeDrv2Drv(drv1,BOOT_DIR,':',"/Distro" BOOT_DIR);

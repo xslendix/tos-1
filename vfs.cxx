@@ -176,7 +176,9 @@ char** VFsDir(char const* fn) {
   std::vector<char*> items;
   for (auto const& e : fs::directory_iterator{file}) {
     auto const& s = e.path().filename().string();
-    if (s.size() <= 37)
+    // CDIR_FILENAME_LEN is 101(includes '\0')
+    // used to be much smaller but who cares this aint fat32 lmao
+    if (s.size() <= 100)
       items.emplace_back((char*)HolyStrDup(s.c_str()));
   }
   size_t sz = items.size() * sizeof(char*);

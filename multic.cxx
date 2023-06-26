@@ -26,7 +26,6 @@
 #endif
 
 #ifdef __linux__
-// https://man7.org/linux/man-pages/man2/futex.2.html
 #include <linux/futex.h>
 #include <sys/syscall.h>
 #elif defined __FreeBSD__
@@ -46,15 +45,11 @@ uint64_t GetTicks() {
 
 /*
  * This takes advantage of the host OS' thread local storage provided in C++11,
- * so that the FS and GS registers won't be disturbed.
+ * so that the FS and GS registers on the host OS won't be disturbed.
  *
  * Note on Fs and Gs: They might seem like very weird names for ThisTask and
  * ThisCPU repectively but it's because they are stored in the F Segment and G
- * Segment registers. Multics, a very old operating system(surprisingly still
- * alive to this day) treated files as memory segments, and used the FS and GS
- * registers for that purpose. (https://archive.md/pf2td) However
- * more recent operating systems have gone back to the "Open handle, write shit
- * and close handle" paradigm again, presumably for compatibility with C.
+ * Segment registers. (https://archive.md/pf2td)
  */
 
 thread_local std::atomic<void*> Fs;
@@ -100,9 +95,9 @@ struct CCore {
    * UMTX_OP_WAIT)
    */
   alignas(4) uint32_t is_sleeping;
-  // not using atomics here because i need them
-  // for system calls and casting std::atomic<T>* to T*
-  // is potentially UB and
+  // not using atomics here(instead using atomic builtins that operate on plain
+  // values) because i need them for system calls and casting std::atomic<T>* to
+  // T* is potentially UB and
   // static_assert(std::is_layout_compatible_v<std::atomic<uint32_t>, uint32_t>)
   // failed on my machine
 #endif
@@ -123,12 +118,10 @@ static void*
   VFsThrdInit();
   core_num = (uintptr_t)c;
 #ifndef _WIN32
-  for (auto& tmp : TOSLoader["__InterruptCoreRoutine"]) {
-    if (tmp.type == HTT_IMPORT_SYS_SYM)
-      continue;
-    if (tmp.val)
-      signal(SIGUSR2, (void (*)(int))tmp.val);
-  }
+  static void* fp = nullptr;
+  if (fp == nullptr)
+    fp = TOSLoader["__InterruptCoreRoutine"][0].val;
+  signal(SIGUSR2, (void (*)(int))fp);
   signal(SIGUSR1, [](int) {
     pthread_exit(nullptr);
   });

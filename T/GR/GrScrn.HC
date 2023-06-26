@@ -362,9 +362,9 @@ U0 GrUpdateTextModeText()
 U0 GrUpdateVGAGraphics()
 {//Update Graphic Card
 }
-U8 *_3days_screen=NULL;
+U8 *_screen=NULL;
 if(!__IsCmdLine)
-  _3days_screen=DrawWindowNew;
+  _screen=DrawWindowNew;
 U0 ScaleMouseCords(I64 *x,I64 *y) {
   I64 x2=*x,y2=*y;
   x2=(ToF64(x2)/640*640.);
