@@ -47,11 +47,11 @@ Dir;
 Dir("fold*");//supports wildcards
 Cd("folder");
 Man("Ed");
-Ed("a.HC");
-Find("str",,"-i");//grep -rn . -e str
-FF("file.*");//find .|grep file
+Ed("file.HC.Z");
 Unzip("file.HC.Z");//unzip tos compression
 Zip("file.HC");
+Find("str",,"-i");//grep -rn . -e str
+FF("file.*");//find .|grep file
 DbgHelp;//help on how to debug
 INT3;//force raise debug situation
 ExitTOS(I32i ec=0);
