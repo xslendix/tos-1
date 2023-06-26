@@ -8,6 +8,7 @@ install msys2, launch the "MSYS2 MINGW64 Shell", and run the following
 ```
 pacman -Syu make yasm mingw-w64-x86_64-{gcc,SDL2,cmake,libuv}
 ```
+if pacman tells you to restart the terminal then do it and run the cmd again(rtfm)
 ## unix-like system users
 install SDL2, cmake, make, yasm, gcc/clang(clang preferred) and libuv
 ## building the loader
