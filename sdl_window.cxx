@@ -1,4 +1,5 @@
 #include "ffi.h"
+#include "logo.hxx"
 #include "main.hxx"
 
 #include <algorithm>
@@ -41,21 +42,24 @@ void SetClipboard(char const* text) {
 }
 
 std::string const ClipboardText() {
-  char* s = SDL_GetClipboardText();
-  if (s == nullptr)
+  char* sdl_clip = SDL_GetClipboardText();
+  if (sdl_clip == nullptr)
     return {};
-  std::string sdl_clip = s;
-  SDL_free(s);
+  std::string s = sdl_clip;
+  SDL_free(sdl_clip);
   if (sanitize_clipboard) {
-    /*std::erase_if(sdl_clip, [](char c) {
+    /*std::erase_if(s, [](uint8_t c) {
       return ' ' - 1 > c;
-    }); C++20*/
-    for (size_t i = 0; i < sdl_clip.size(); ++i) {
-      if (' ' - 1 > sdl_clip[i])
-        sdl_clip.erase(i, 1);
-    }
+    }); C++20
+    below is the C++17 equivalent because reasons*/
+    // uint8 is important here since signed char
+    // might become negative for utf-8 bytes
+    auto it = std::remove_if(s.begin(), s.end(), [](uint8_t c) {
+      return ' ' - 1 > c;
+    });
+    s.erase(it, s.end());
   }
-  return sdl_clip;
+  return s;
 }
 
 CDrawWindow* NewDrawWindow() {
@@ -74,8 +78,23 @@ CDrawWindow* NewDrawWindow() {
   win.screen_mutex = SDL_CreateMutex();
   win.screen_done_cond = SDL_CreateCond();
   win.window =
-      SDL_CreateWindow("TOS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                       640, 480, SDL_WINDOW_RESIZABLE);
+      SDL_CreateWindow("TempleOS", SDL_WINDOWPOS_CENTERED,
+                       SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_RESIZABLE);
+  SDL_Surface* icon = SDL_CreateRGBSurfaceWithFormat(
+      0, tos_logo.width, tos_logo.height,
+      8 /*bits in a byte*/ * tos_logo.bytes_per_pixel, SDL_PIXELFORMAT_BGR888);
+  SDL_LockSurface(icon);
+  // icon->pixels = const_cast<void*>((void const*)tos_logo.pixel_data);
+  // whatever, just copy it over lmao
+  auto constexpr width_bytes = tos_logo.width * tos_logo.bytes_per_pixel;
+  for (auto i = 0u; i < tos_logo.height; ++i) {
+    auto p = tos_logo.pixel_data + i * width_bytes;
+    std::copy(p, p + width_bytes,
+              static_cast<uint8_t*>(icon->pixels) + i * icon->pitch);
+  }
+  SDL_UnlockSurface(icon);
+  SDL_SetWindowIcon(win.window, icon);
+  SDL_FreeSurface(icon);
   win.surf = SDL_CreateRGBSurface(0, 640, 480, 8, 0, 0, 0, 0);
   win.palette = SDL_AllocPalette(256);
   SDL_SetSurfacePalette(win.surf, win.palette);
@@ -90,16 +109,16 @@ CDrawWindow* NewDrawWindow() {
 }
 
 static void DrawWindowUpdate_pre(CDrawWindow* ul, uint8_t* colors,
-                                 int64_t internal_width, int64_t h) {
+                                 uint64_t internal_width, uint64_t h) {
   if (!SDL_WasInit(SDL_INIT_EVERYTHING))
     return;
   if (!win_init)
     return;
   SDL_Surface* s = win.surf;
-  int64_t x, y, c, i, i2;
+  uint64_t x, y;
   uint8_t *src = colors, *dst = (uint8_t*)s->pixels;
   SDL_LockSurface(s);
-  for (y = 0; y < h; y++) {
+  for (y = 0; y < h; ++y) {
     memcpy(dst, src, 640);
     src += internal_width;
     dst += s->pitch;
@@ -612,7 +631,7 @@ void InputLoop(bool* off) {
   }
 }
 
-// please policeman am i being arrested? i want my rights!
+// please policeman am i under arrest? read me my rights please!
 union bgr_48 {
   struct __attribute__((packed)) {
     uint16_t b, g, r, pad;
