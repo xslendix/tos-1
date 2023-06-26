@@ -33,10 +33,6 @@ static struct CDrawWindow {
   }
 } win;
 
-static std::vector<uint8_t> buf;
-
-static void StartInputScanner();
-
 void SetClipboard(char const* text) {
   SDL_SetClipboardText(text);
 }
@@ -66,7 +62,6 @@ CDrawWindow* NewDrawWindow() {
   if (win_init)
     return &win;
   win_init = true;
-  buf.resize(640 * 480);
   if (!SDL_WasInit(SDL_INIT_EVERYTHING)) {
     SDL_Init(SDL_INIT_EVERYTHING);
     // sdl disables compositor in kde by default
