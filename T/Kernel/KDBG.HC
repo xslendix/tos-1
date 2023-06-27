@@ -71,18 +71,18 @@ U0 FaultCB(U8 **rbp,U8 *fptr) {
     TOSPrint("ENTERED FAULT\n");
     
     ln=SrcEdLink(fptr);
-    if(!ln) ln=StrNew("???");
-    if(f)
+    if (!ln) ln=StrNew("???");
+    if (f)
         TOSPrint("[%d] %s,%s\n",0,f->str,ln);
     else
         TOSPrint("[%d] %s\n",0,ln);
     Free(ln);
     
-    for(bt=0;bt<=5;bt++) {
+    for (bt=1;bt<=5;bt++) {
         ln=SrcEdLink(__CallerBP(rbp,bt));
-        if(!ln) ln=StrNew("???");
+        if (!ln) ln=StrNew("???");
         f=FunSegFind(__CallerBP(rbp,bt),NULL);
-        if(f)
+        if (f)
             TOSPrint("[%d] %s,%s\n",bt,f->str,ln);
         else
             TOSPrint("[%d] %s\n",bt,ln);

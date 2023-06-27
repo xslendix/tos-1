@@ -6,6 +6,9 @@ MOV RBP,RSP;save current stack
 AND RSP,-0x10 ;This will chop off the first hex digit to align to 16(stack grows down so doesnt mess up stack)
 PUSH RAX ;Align to 16 because when i push rbx itd be rsp ≅ 16 (mod 8)
 PUSH RBX ;mandatory register to be saved in win32 abi
+         ;why i dont save other registers: Terry's compiler pushes
+         ;rdi,rsi,r12~r15 when it uses them anyway(not rbx)
+         ;maybe terry did have some ffi in mind or something(idk)
 CALL RCX ;1st argument in win32 abi
 POP RBX
 LEAVE

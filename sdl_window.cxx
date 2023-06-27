@@ -81,12 +81,10 @@ CDrawWindow* NewDrawWindow() {
   SDL_LockSurface(icon);
   // icon->pixels = const_cast<void*>((void const*)tos_logo.pixel_data);
   // whatever, just copy it over lmao
-  auto constexpr width_bytes = tos_logo.width * tos_logo.bytes_per_pixel;
-  for (auto i = 0u; i < tos_logo.height; ++i) {
-    auto p = tos_logo.pixel_data + i * width_bytes;
-    std::copy(p, p + width_bytes,
-              static_cast<uint8_t*>(icon->pixels) + i * icon->pitch);
-  }
+  auto constexpr bytes =
+      tos_logo.width * tos_logo.height * tos_logo.bytes_per_pixel;
+  std::copy(tos_logo.pixel_data, tos_logo.pixel_data + bytes,
+            static_cast<uint8_t*>(icon->pixels));
   SDL_UnlockSurface(icon);
   SDL_SetWindowIcon(win.window, icon);
   SDL_FreeSurface(icon);

@@ -1,9 +1,10 @@
 # templeos in ring 3
-### you should already know the basics of templeos before attempting to use this
+### you ***must*** already know the basics of templeos before attempting to use this
+### readme is intentionally minimalistic as an entry barrier
 
 # building
 ## windows users
-### support only for >=Win10, msvc unsupported
+### only supports only >=Win10(complain to msys2 devs not me), msvc unsupported
 install msys2, launch the "MSYS2 MINGW64 Shell", and run the following
 ```
 pacman -Syu make yasm mingw-w64-x86_64-{gcc,SDL2,cmake,libuv}
@@ -28,8 +29,8 @@ mv T/HCRT.BIN .
 ```
 ./tos -t T #-h for info on other flags
 ```
-# caveat
-due to running in userspace, context switching is around 4 times slower <br>
+# caveats
+due to running in userspace, context switching is around 4 times slower(not that it matters anyway outside of flexing `CPURep(TRUE);` results) <br>
 division by zero is not an exception, it will bring up the debugger(SIGFPE)
 
 # documentation

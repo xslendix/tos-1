@@ -51,36 +51,37 @@ static void LoadOneImport(char** src_, char* mod_base) {
           for (auto& tmp : v) {
             if (tmp.type == HTT_IMPORT_SYS_SYM)
               continue;
-            i = (int64_t)tmp.val;
+            i = (uintptr_t)tmp.val;
             break;
           }
         }
       }
     }
+    // probably breaks strict aliasing :(
     switch (etype) {
     case IET_REL_I8:
       *ptr = (char*)i - ptr - 1;
       break;
     case IET_IMM_U8:
-      *ptr = (uintptr_t)i;
+      *ptr = i;
       break;
     case IET_REL_I16:
       *(int16_t*)ptr = (char*)i - ptr - 2;
       break;
     case IET_IMM_U16:
-      *(int16_t*)ptr = (int64_t)i;
+      *(int16_t*)ptr = i;
       break;
     case IET_REL_I32:
       *(int32_t*)ptr = (char*)i - ptr - 4;
       break;
     case IET_IMM_U32:
-      *(int32_t*)ptr = (int64_t)i;
+      *(int32_t*)ptr = i;
       break;
     case IET_REL_I64:
       *(int64_t*)ptr = (char*)i - ptr - 8;
       break;
     case IET_IMM_I64:
-      *(int64_t*)ptr = (int64_t)i;
+      *(int64_t*)ptr = static_cast<int64_t>(i);
       break;
     }
   }
@@ -102,10 +103,12 @@ static void SysSymImportsResolve(char* st_ptr) {
 
 static void LoadPass1(char* src, char* mod_base) {
   char *ptr, *st_ptr;
-  int64_t i, cnt, etype;
+  int64_t i;
+  size_t cnt;
+  uint8_t etype;
   CHash tmpex;
   while ((etype = *src++)) {
-    i = *((int32_t*)src);
+    i = *(int32_t*)src;
     src += 4;
     st_ptr = src;
     src += strlen(st_ptr) + 1;
@@ -128,13 +131,14 @@ static void LoadPass1(char* src, char* mod_base) {
       break;
     case IET_ABS_ADDR: {
       cnt = i;
-      for (int64_t j = 0; j < cnt; j++) {
+      for (size_t j = 0; j < cnt; j++) {
         ptr = mod_base + *(int32_t*)src;
         src += 4;
         *(int32_t*)ptr += (uintptr_t)mod_base;
       }
     } break;
-    default:;
+    default:; // the other ones wont be used
+              // so im not implementing them
     }
   }
 }
@@ -152,15 +156,15 @@ static void LoadPass2(char* src, char* mod_base) {
       FFI_CALL_TOS_0_ZERO_BP(mod_base + i);
       break;
     case IET_ABS_ADDR:
-      src += sizeof(int32_t) * i;
+      src += sizeof(uint32_t) * i;
       break;
     case IET_CODE_HEAP:
     case IET_ZEROED_CODE_HEAP:
-      src += 4 + sizeof(int32_t) * i;
+      src += 4 + sizeof(uint32_t) * i;
       break;
     case IET_DATA_HEAP:
     case IET_ZEROED_DATA_HEAP:
-      src += 8 + sizeof(int32_t) * i;
+      src += 8 + sizeof(uint32_t) * i;
       break;
     }
   }
@@ -195,13 +199,13 @@ void LoadHCRT(std::string const& name) {
   mod_base = (char*)bfh_addr + sizeof(CBinFile);
   LoadPass1((char*)bfh_addr + bfh_addr->patch_table_offset, mod_base);
 #ifndef _WIN32
-  // signal(SIGUSR2, (void (*)(int))TOSLoader["__InterruptCoreRoutine"][0].val);
+  signal(SIGUSR2, (void (*)(int))TOSLoader["__InterruptCoreRoutine"][0].val);
 #endif
   SetupDebugger();
   LoadPass2((char*)bfh_addr + bfh_addr->patch_table_offset, mod_base);
 }
 
-__attribute__((noinline)) void BackTrace() {
+void BackTrace() {
   static size_t sz = 0;
   std::string last;
   static std::vector<std::string> sorted;
@@ -243,7 +247,9 @@ __attribute__((noinline)) void BackTrace() {
   }
 }
 
-std::string WhichFun(void* ptr) {
+// great when you use gdb and get a fault
+// > p WhichFun($pc)
+__attribute__((used)) std::string WhichFun(void* ptr) {
   size_t sz = TOSLoader.size();
   std::string last;
   static std::vector<std::string> sorted;

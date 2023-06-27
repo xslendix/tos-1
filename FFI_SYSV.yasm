@@ -4,6 +4,9 @@ FFI_CALL_TOS_0:
 PUSH RBP
 MOV RBP,RSP;save current stack
 PUSH RBX;register that must be saved
+        ;why i dont save other registers: Terry's compiler pushes
+        ;r12~r15 when it uses them anyway(not rbx)
+        ;maybe terry did have some ffi in mind or something(idk)
 CALL RDI;1st arg
 POP RBX
 LEAVE

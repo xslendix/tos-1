@@ -32,9 +32,7 @@ static U0 BootstrapImportSymbol(U8 *name,U8 *ptr,I64 type) {
 #endif
     }
 }
-static U0 __BootstrapForeachSymbol__(U0 *cptr) {
-    __BootstrapForeachSymbol(cptr);
-}
+
 asm {
 //I am embeding these into the binary so end-users don't mess up thier KERNEL*.HH files
   KERNELA_BIN::

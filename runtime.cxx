@@ -309,7 +309,7 @@ static void STK__GrPaletteColorSet(int64_t* stk) {
   GrPaletteColorSet(stk[0], stk[1]);
 }
 
-static int64_t IsValidPtr(int64_t* stk) {
+static uint64_t IsValidPtr(uintptr_t* stk) {
 #ifdef _WIN32
   // Wine doesnt like the
   // IsBadReadPtr,so use a polyfill
@@ -343,8 +343,8 @@ static int64_t IsValidPtr(int64_t* stk) {
   return -1 != msync((void*)stk[0], ps, MS_ASYNC);
   /*#elif defined(__linux__)
         // TOO FUCKING GODDAMN SLOW!!!!!
-    auto constexpr Hex2I64 = [](char const *ptr, char const** res) {
-      int64_t ret = 0;
+    auto constexpr Hex2U64 = [](char const *ptr, char const** res) {
+      uint64_t ret = 0;
       char c;
       while (isxdigit(c = *ptr)) {
         ret <<= 4;
@@ -359,9 +359,9 @@ static int64_t IsValidPtr(int64_t* stk) {
     std::string buffer;
     while (std::getline(map, buffer)) {
       char const* ptr = buffer.data();
-      auto lower = Hex2I64(ptr, &ptr);
+      uintptr_t lower = Hex2U64(ptr, &ptr);
       ++ptr; // skip '-'
-      auto upper = Hex2I64(ptr, &ptr);
+      uintptr_t upper = Hex2U64(ptr, &ptr);
       if (lower <= stk[0] && stk[0] <= upper)
         return 1;
     }
@@ -375,7 +375,7 @@ static void STK_InterruptCore(int64_t* stk) {
   InterruptCore(stk[0]);
 }
 
-static void STK_ForeachFunc(int64_t* stk) {
+static void STK___BootstrapForeachSymbol(int64_t* stk) {
   for (auto& m : TOSLoader) {
     auto& [symname, vec] = m;
     if (vec.size() == 0)
@@ -400,7 +400,7 @@ static int64_t STK_DrawWindowUpdate(int64_t* stk) {
   return 0;
 }
 
-int64_t STK__GetTicksHP() {
+int64_t STK___GetTicksHP() {
 #ifndef _WIN32
   struct timespec ts;
   int64_t theTick = 0U;
@@ -434,17 +434,17 @@ int64_t STK_SetMSCallback(int64_t* stk) {
   return 0;
 }
 
-int64_t STK_AwakeFromSleeping(int64_t* stk) {
+int64_t STK___AwakeCore(int64_t* stk) {
   AwakeFromSleeping(stk[0]);
   return 0;
 }
 
-int64_t STK_SleepHP(int64_t* stk) {
+int64_t STK___SleepHP(int64_t* stk) {
   SleepHP(stk[0]);
   return 0;
 }
 
-int64_t STK_Sleep(int64_t* stk) {
+int64_t STK___Sleep(int64_t* stk) {
   SleepHP((uint64_t)stk[0] * 1000);
   return 0;
 }
@@ -493,7 +493,7 @@ int64_t STK_FUnixTime(int64_t* stk) {
   return VFsUnixTime((char*)stk[0]);
 }
 
-int64_t STK_FTrunc(int64_t* stk) {
+int64_t STK_VFsFTrunc(int64_t* stk) {
   fs::resize_file(VFsFileNameAbs((char*)stk[0]), stk[1]);
   return 0;
 }
@@ -506,13 +506,13 @@ int64_t STK___FExists(int64_t* stk) {
 
 #include <time.h>
 
-uint64_t STK_Now(int64_t* stk) {
+uint64_t STK_UnixNow(int64_t* stk) {
   return time(nullptr);
 }
 
 #else
 
-uint64_t STK_Now(int64_t* stk) {
+uint64_t STK_UnixNow(int64_t* stk) {
   int64_t r;
   FILETIME ft;
   GetSystemTimeAsFileTime(&ft);
@@ -555,7 +555,7 @@ int64_t STK_VFsIsDir(int64_t* stk) {
   return VFsIsDir((char*)stk[0]);
 }
 
-int64_t STK_VFsFileSize(int64_t* stk) {
+int64_t STK_VFsFSize(int64_t* stk) {
   return VFsFSize((char*)stk[0]);
 }
 
@@ -608,7 +608,7 @@ int64_t STK_VFsFSeek(int64_t* stk) {
   return 0;
 }
 
-int64_t STK_VFsDrv(int64_t* stk) {
+int64_t STK_VFsSetDrv(int64_t* stk) {
   VFsSetDrv(stk[0]);
   return 0;
 }
@@ -639,6 +639,7 @@ static void STK_ExitTOS(int64_t* stk) {
 
 static void RegisterFunctionPtr(std::string& blob, char const* name, void* fp,
                                 size_t arity) {
+  // Function entry point offset from the code blob
   auto sz = blob.size();
 #ifdef _WIN32
   // clang-format off
@@ -740,11 +741,11 @@ static void RegisterFunctionPtr(std::string& blob, char const* name, void* fp,
   // A bit about HolyC ABI: all args are 8 bytes(64 bits)
   // let there be function Foo(I64 i, ...);
   // Foo(2, 4, 5, 6)
-  //   argv[2] 6
-  //   argv[1] 5
-  //   argv[0] 4
-  //   i  2
-  //   argc 3(num of varargs) // RBP + 16(this is where the stack starts)
+  //   argv[2] 6 // RBP + 48
+  //   argv[1] 5 // RBP + 40
+  //   argv[0] 4 // RBP + 32 <-points- argv(internal var in function)
+  //   argc 3(num of varargs) // RBP + 24 <-value- argc(internal var in function)
+  //   i  2    // RBP + 16(this is where the stack starts)
   // clang-format on
   blob.push_back('\xc2');
   arity *= 8;
@@ -761,95 +762,96 @@ void RegisterFuncPtrs() {
   std::string ffi_blob;
 #define R_(holy, secular, arity) \
   RegisterFunctionPtr(ffi_blob, holy, reinterpret_cast<void*>(secular), arity)
-  R_("UnixNow", STK_Now, 0);
-  R_("InterruptCore", STK_InterruptCore, 1);
-  R_("NewVirtualChunk", STK_NewVirtualChunk, 2);
-  R_("FreeVirtualChunk", STK_FreeVirtualChunk, 2);
+#define S_(name, arity)                                                     \
+  RegisterFunctionPtr(ffi_blob, #name, reinterpret_cast<void*>(STK_##name), \
+                      arity)
   R_("__CmdLineBootText", CmdLineBootText, 0);
-  R_("ExitTOS", STK_ExitTOS, 1);
-  R_("__GetStr", STK___GetStr, 1);
   R_("__IsCmdLine", IsCmdLine, 0);
-  R_("__FExists", STK___FExists, 1);
   R_("mp_cnt", mp_cnt, 0);
   R_("__SpawnCore", SpawnCore, 2);
   R_("__CoreNum", CoreNum, 0);
-  R_("FUnixTime", STK_FUnixTime, 1);
-  R_("SetClipboardText", STK_SetClipboardText, 1);
-  R_("GetClipboardText", STK_GetClipboardText, 0);
-  R_("SndFreq", STK_SndFreq, 1);
-  R_("__Sleep", &STK_Sleep, 1);
-  R_("__SleepHP", &STK_SleepHP, 1);
-  R_("__AwakeCore", &STK_AwakeFromSleeping, 1);
   R_("GetFs", GetFs, 0);
-  R_("SetFs", STK_SetFs, 1);
   R_("GetGs", GetGs, 0);
-  R_("SetGs", STK_SetGs, 1);
-  R_("SetKBCallback", STK_SetKBCallback, 2);
-  R_("SetMSCallback", STK_SetMSCallback, 1);
-  R_("__GetTicks", STK___GetTicks, 0);
   R_("__IsValidPtr", IsValidPtr, 1);
-  R_("__BootstrapForeachSymbol", STK_ForeachFunc, 1);
-  R_("IsDir", STK_IsDir, 1);
-  R_("DrawWindowUpdate", STK_DrawWindowUpdate, 4);
   R_("DrawWindowNew", NewDrawWindow, 0);
-  R_("UnblockSignals", STK_UnblockSignals, 0);
+  S_(UnixNow, 0);
+  S_(InterruptCore, 1);
+  S_(NewVirtualChunk, 2);
+  S_(FreeVirtualChunk, 2);
+  S_(ExitTOS, 1);
+  S_(__GetStr, 1);
+  S_(__FExists, 1);
+  S_(FUnixTime, 1);
+  S_(SetClipboardText, 1);
+  S_(GetClipboardText, 0);
+  S_(SndFreq, 1);
+  S_(__Sleep, 1);
+  S_(__SleepHP, 1);
+  S_(__AwakeCore, 1);
+  S_(SetFs, 1);
+  S_(SetGs, 1);
+  S_(SetKBCallback, 2);
+  S_(SetMSCallback, 1);
+  S_(__GetTicks, 0);
+  S_(__BootstrapForeachSymbol, 1);
+  S_(IsDir, 1);
+  S_(DrawWindowUpdate, 4);
+  S_(UnblockSignals, 0);
   /*
    * In TempleOS variadics, functions follow __cdecl, whereas normally
    * they follow __stdcall which is why the arity argument is needed(RET1 x).
    * Thus we don't have to clean up the stack in variadics.
    */
-  R_("TOSPrint", STK_TOSPrint, 0);
-
-  R_("DyadInit", &STK_DyadInit, 0);
-  R_("DyadUpdate", &STK_DyadUpdate, 0);
-  R_("DyadShutdown", &STK_DyadShutdown, 0);
-  R_("DyadNewStream", &STK_DyadNewStream, 0);
-  R_("DyadListen", &STK_DyadListen, 2);
-  R_("DyadConnect", &STK_DyadConnect, 3);
-  R_("DyadWrite", &STK_DyadWrite, 3);
-  R_("DyadEnd", &STK_DyadEnd, 1);
-  R_("DyadClose", &STK_DyadClose, 1);
-  R_("DyadGetAddress", STK_DyadGetAddress, 1);
-  R_("DyadSetReadCallback", STK_DyadSetReadCallback, 3);
-  R_("DyadSetOnListenCallback", STK_DyadSetOnListenCallback, 3);
-  R_("DyadSetOnConnectCallback", STK_DyadSetConnectCallback, 3);
-  R_("DyadSetOnCloseCallback", STK_DyadSetCloseCallback, 3);
-  R_("DyadSetOnReadyCallback", STK_DyadSetReadyCallback, 3);
-  R_("DyadSetOnTimeoutCallback", STK_DyadSetTimeoutCallback, 3);
-  R_("DyadSetOnTickCallback", STK_DyadSetTimeoutCallback, 3);
-  R_("DyadSetOnErrorCallback", STK_DyadSetErrorCallback, 3);
-  R_("DyadSetOnDestroyCallback", STK_DyadSetDestroyCallback, 3);
-  R_("DyadSetTimeout", STK_DyadSetTimeout, 2);
-  R_("DyadSetNoDelay", STK_DyadSetNoDelay, 2);
-  R_("VFsFTrunc", STK_FTrunc, 2);
-  R_("VFsSetPwd", STK_VFsSetPwd, 1);
-  R_("VFsExists", STK_VFsExists, 1);
-  R_("VFsIsDir", STK_VFsIsDir, 1);
-  R_("VFsFSize", STK_VFsFileSize, 1);
-  R_("VFsFRead", STK_VFsFRead, 2);
-  R_("VFsFWrite", STK_VFsFWrite, 3);
-  R_("VFsDel", STK_VFsDel, 1);
-  R_("VFsDir", STK_VFsDir, 0);
-  R_("VFsDirMk", STK_VFsDirMk, 1);
-  R_("VFsFBlkRead", STK_VFsFBlkRead, 4);
-  R_("VFsFBlkWrite", STK_VFsFBlkWrite, 4);
-  R_("VFsFOpenW", STK_VFsFOpenW, 1);
-  R_("VFsFOpenR", STK_VFsFOpenR, 1);
-  R_("VFsFClose", STK_VFsFClose, 1);
-  R_("VFsFSeek", STK_VFsFSeek, 2);
-  R_("VFsSetDrv", STK_VFsDrv, 1);
-  R_("GetVolume", STK_GetVolume, 0);
-  R_("SetVolume", STK_SetVolume, 1);
-  R_("__GetTicksHP", STK__GetTicksHP, 0);
-  R_("_GrPaletteColorSet", STK__GrPaletteColorSet, 2);
-  R_("UVBufBase", STK_UVBufBase, 1);
-  R_("UVBufLen", STK_UVBufLen, 1);
-  R_("UVRandom", STK_UVRandom, 6);
-  R_("UVRandomNew", STK_UVRandomNew, 0);
-  R_("UVRandomDel", STK_UVRandomDel, 1);
-  R_("UVLoopNew", STK_UVLoopNew, 0);
-  R_("UVLoopDel", STK_UVLoopDel, 1);
-  R_("UVRun", STK_UVRun, 2);
+  S_(TOSPrint, 0);
+  S_(DyadInit, 0);
+  S_(DyadUpdate, 0);
+  S_(DyadShutdown, 0);
+  S_(DyadNewStream, 0);
+  S_(DyadListen, 2);
+  S_(DyadConnect, 3);
+  S_(DyadWrite, 3);
+  S_(DyadEnd, 1);
+  S_(DyadClose, 1);
+  S_(DyadGetAddress, 1);
+  S_(DyadSetReadCallback, 3);
+  S_(DyadSetOnListenCallback, 3);
+  S_(DyadSetConnectCallback, 3);
+  S_(DyadSetCloseCallback, 3);
+  S_(DyadSetReadyCallback, 3);
+  S_(DyadSetTimeoutCallback, 3);
+  S_(DyadSetTimeoutCallback, 3);
+  S_(DyadSetErrorCallback, 3);
+  S_(DyadSetDestroyCallback, 3);
+  S_(DyadSetTimeout, 2);
+  S_(DyadSetNoDelay, 2);
+  S_(VFsFTrunc, 2);
+  S_(VFsSetPwd, 1);
+  S_(VFsExists, 1);
+  S_(VFsIsDir, 1);
+  S_(VFsFSize, 1);
+  S_(VFsFRead, 2);
+  S_(VFsFWrite, 3);
+  S_(VFsDel, 1);
+  S_(VFsDir, 0);
+  S_(VFsDirMk, 1);
+  S_(VFsFBlkRead, 4);
+  S_(VFsFBlkWrite, 4);
+  S_(VFsFOpenW, 1);
+  S_(VFsFOpenR, 1);
+  S_(VFsFClose, 1);
+  S_(VFsFSeek, 2);
+  S_(VFsSetDrv, 1);
+  S_(GetVolume, 0);
+  S_(SetVolume, 1);
+  S_(__GetTicksHP, 0);
+  S_(_GrPaletteColorSet, 2);
+  S_(UVBufBase, 1);
+  S_(UVBufLen, 1);
+  S_(UVRandomNew, 0);
+  S_(UVRandomDel, 1);
+  S_(UVLoopNew, 0);
+  S_(UVLoopDel, 1);
+  S_(UVRun, 2);
   auto blob = static_cast<char*>(NewVirtualChunk(ffi_blob.size(), true));
   std::copy(ffi_blob.begin(), ffi_blob.end(), blob);
   for (auto& m : TOSLoader) {

@@ -9,6 +9,7 @@ namespace fs = std::filesystem;
 #include <memory>
 #include <utility>
 
+#include <limits.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -28,8 +29,8 @@ namespace fs = std::filesystem;
 #include <winnt.h>
 #endif
 
-static int64_t Hex2I64(char const* ptr, char const** res) {
-  int64_t ret = 0;
+static inline uint64_t Hex2U64(char const* ptr, char const** res) {
+  uint64_t ret = 0;
   char c;
   while (isxdigit(c = *ptr)) {
     ret <<= 4;
@@ -52,39 +53,42 @@ void* NewVirtualChunk(size_t sz, bool low32) {
   if (pad)
     pad = ps;
   if (low32) { // code heap
-    // sz / ps * ps seems meaningless but its actually aligning sz to ps(page
-    // size)
+    // sz / ps * ps seems meaningless
+    // but its actually aligning sz to ps(page size)
     ret = mmap(nullptr, sz / ps * ps + pad, PROT_EXEC | PROT_WRITE | PROT_READ,
                MAP_PRIVATE | MAP_ANON | MAP_32BIT, -1, 0);
 #ifdef __linux__
     // I hear that linux doesn't like addresses within the first 16bits
+    // maybe its the stack space?
     if (ret == MAP_FAILED) {
-      auto down = reinterpret_cast<char*>((uintptr_t)0x10000);
+      uintptr_t down = 0x1000;
       std::ifstream map{"/proc/self/maps", ios::binary | ios::in};
       std::string buffer;
       while (std::getline(map, buffer)) {
         char const* ptr = buffer.data();
-        auto lower = (char*)Hex2I64(ptr, &ptr);
+        uint64_t lower = Hex2U64(ptr, &ptr);
         // basically finds a gap between the previous line's upper address
         // and the current line's lower address so it can allocate there
-        if ((lower - down) >= (sz / ps * ps + pad) && lower > down) {
+        if (lower <= UINT32_MAX && (lower - down) >= (sz / ps * ps + pad) &&
+            lower > down) {
           goto found;
         }
         // ignore '-'
         ++ptr;
-        auto upper = (char*)Hex2I64(ptr, &ptr);
+        uint64_t upper = Hex2U64(ptr, &ptr);
         down = upper;
       }
     found:
-      ret = mmap(down, sz / ps * ps + pad, PROT_EXEC | PROT_WRITE | PROT_READ,
-                 MAP_PRIVATE | MAP_ANON | MAP_FIXED | MAP_32BIT, -1, 0);
+      ret = mmap(reinterpret_cast<void*>(down), sz / ps * ps + pad,
+                 PROT_EXEC | PROT_WRITE | PROT_READ,
+                 MAP_PRIVATE | MAP_ANON | MAP_FIXED, -1, 0);
     }
 #endif
   } else // data heap
     ret = mmap(nullptr, sz / ps * ps + pad, PROT_WRITE | PROT_READ,
                MAP_PRIVATE | MAP_ANON, -1, 0);
   if (ret == MAP_FAILED)
-    return NULL;
+    return nullptr;
   return ret;
 #else
   if (low32) { // code heap
@@ -97,7 +101,7 @@ void* NewVirtualChunk(size_t sz, bool low32) {
     }
     MEMORY_BASIC_INFORMATION ent;
     uint64_t alloc = dwAllocationGranularity, addr;
-    while (alloc <= 0xFFffFFff) {
+    while (alloc <= UINT32_MAX) {
       if (!VirtualQuery((void*)alloc, &ent, sizeof(ent)))
         return nullptr;
       alloc = (uint64_t)ent.BaseAddress + ent.RegionSize;

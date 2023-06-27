@@ -44,8 +44,11 @@ uint64_t GetTicks() {
 }
 
 /*
- * This takes advantage of the host OS' thread local storage provided in C++11,
- * so that the FS and GS registers on the host OS won't be disturbed.
+ * (DolDoc code)
+ * $ID,-2$$TR-C,"How do you use the FS and GS segment registers."$
+ * $ID,2$$FG,2$MOV RAX,FS:[RAX]$FG$ : FS can be set with a $FG,2$WRMSR$FG$, but
+ * displacement is RIP relative, so it's tricky to use.  FS is used for the
+ * current $LK,"CTask",A="MN:CTask"$, GS for $LK,"CCPU",A="MN:CCPU"$.
  *
  * Note on Fs and Gs: They might seem like very weird names for ThisTask and
  * ThisCPU repectively but it's because they are stored in the F Segment and G
@@ -167,7 +170,7 @@ void LaunchCore0(void* (*fp)(void*)) {
   // thread name on windows(https://archive.md/9jiD5)
 #else
   pthread_create(&cores[0].thread, nullptr, fp, nullptr);
-  pthread_setname_np(cores[0].thread, "Seth");
+  pthread_setname_np(cores[0].thread, "Seth/Adam(Core0)");
 #endif
 }
 
@@ -242,8 +245,11 @@ void AwakeFromSleeping(size_t core) {
 static UINT tick_inc;
 static std::atomic<uint64_t> ticks = 0;
 
-// We need to use winmm shit because windows
-// doesnt really has a highres timer
+// To just get ticks we can use QueryPerformanceFrequency
+// and QueryPerformanceCounter but we cant to set an winmm
+// event that updates the tick count while also helping cores wake up
+//
+// i killed two birds with one stoner
 static uint64_t GetTicksHP() {
   static std::atomic<bool> init = false;
   if (!init) {
