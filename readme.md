@@ -22,7 +22,7 @@ make -j$(nproc);
 # build runtime
 ```
 cp HCRT_BOOTSTRAP.BIN HCRT.BIN
-./tos -ctT BuildHCRT.BIN
+./tos -ctT BuildHCRT.HC
 mv T/HCRT.BIN .
 ```
 # run

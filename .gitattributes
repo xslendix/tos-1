@@ -2,3 +2,4 @@
 *.HH linguist-language=HolyC
 *.HC linguist-language=HolyC
 ext/** linguist-vendored
+cmake/** linguist-vendored

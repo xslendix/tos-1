@@ -25,13 +25,18 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-find_program(CLANG   clang)
-find_program(CLANGXX clang++)
+include (DetectArch)
+target_architecture(ARCH)
+if (NOT ARCH MATCHES "x86_64")
+  message(FATAL_ERROR "CAN ONLY BUILD ON x86_64 ARCHITECTURE")
+endif ()
 
 if (NOT WIN32)
   # prefer clang instead of gcc (or whatever garbage compiler they're using) This can be disabled with
   # the NO_CLANG option
   option(NO_CLANG "Don't prefer clang for compilation" OFF)
+  find_program(CLANG   clang)
+  find_program(CLANGXX clang++)
   if (NOT NO_CLANG)
     if (CLANG)
       set(CMAKE_C_COMPILER ${CLANG})
