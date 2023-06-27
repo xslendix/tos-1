@@ -309,7 +309,7 @@ static char constexpr keys[] = {
     0,   0,      0,    0,   0,    0,   0,   0,   0,   '-', 0,   '5', 0,
     '+', 0,      0,    0,   0,    0,   0,   0,   0,   0,   0,   0};
 
-inline static constexpr uint64_t K2SC(char ch) {
+static inline constexpr uint64_t K2SC(char ch) {
   for (size_t i = 0; i != sizeof(keys) / sizeof(*keys); i++) {
     if (keys[i] == ch)
       return i;

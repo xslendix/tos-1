@@ -4,7 +4,7 @@
 
 # building
 ## windows users
-### only supports only >=Win10(complain to msys2 devs not me), msvc unsupported
+### only supports >=Win10(complain to msys2 devs not me), msvc unsupported
 install msys2, launch the "MSYS2 MINGW64 Shell", and run the following
 ```
 pacman -Syu make yasm mingw-w64-x86_64-{gcc,SDL2,cmake,libuv}
