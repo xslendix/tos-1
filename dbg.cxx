@@ -111,7 +111,7 @@ static void routine(int sig, siginfo_t* info, ucontext_t* ctx) {
       REG(EFL),
   };
 #elif defined(__FreeBSD__)
-#define REG(X) ctx->uc_mcontext.mc_##X
+#define REG(X) static_cast<uint64_t>(ctx->uc_mcontext.mc_##X)
   uint64_t regs[] = {
       REG(rax),    REG(rcx), REG(rdx),
       REG(rbx),    REG(rsp), REG(rbp),

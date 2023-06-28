@@ -2821,7 +2821,8 @@ class CISOPriDesc
 #define MT_DVD		2
 
 //CDirEntry flags (Used by \dLK,"FileMgr",A="MN:FileMgr"\d())
-#define CDIR_FILENAME_LEN	101 //Must include terminator zero
+//DO NOT CHANGE
+#define CDIR_FILENAME_LEN	38 //Must include terminator zero
 public class CDirEntry
 {
   CDirEntry *next,*parent,*sub;
@@ -4976,7 +4977,7 @@ extern U0 ICMov(CIntermediateCode *tmpi,
 	CICType t1,I64 r1,I64 d1,CICType t2,I64 r2,I64 d2,I64 rip);
 extern U0 ICLea(CIntermediateCode *tmpi,CICType t1,I64 r1,I64 d1,
 	CICType t2,I64 r2,I64 d2,CCmpCtrl *cc,U8 *buf,I64 rip);
-extern U0 ICDeref(CIntermediateCode *tmpi,I64 rip);
+extern U0 ICDeref(CIntermediateCode *tmpi,I64 rip);
 extern U0 LexPutToken(CCmpCtrl *cc);
 extern U8 *LexPutLine(CCmpCtrl *cc,U8 *start);
 extern U0 LexPutPos(CCmpCtrl *cc);
@@ -6539,7 +6540,7 @@ extern CDrv *DrvChk(CDrv *dv,Bool except=TRUE);
 extern U8 DrvTextAttrGet(U8 drv_let=0);
 extern Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA);
 extern U0 DrvsRelease();
-extern U0 DskCacheInvalidate(CDrv *dv);
+extern U0 DskCacheInvalidate(CDrv *dv);
 extern U8 *FileExtRem(U8 *src,U8 *dst=NULL);
 extern U8 *FileNameAbs(U8 *_filename,I64 fuf_flags=0);
 extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL);

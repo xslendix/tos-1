@@ -62,7 +62,6 @@ T/T/**
 iso_dir/**
 T/TempleOS.ISO.C
 T/HCRT.BIN
-T/HCRT.DBG.Z
 T/Registry.HC.Z
 T/WikiBackups
 HCRT.BIN
@@ -71,3 +70,4 @@ T/Headers.HH
 T/unfound.DD
 build
 tos
+T/HCRT.DBG.Z

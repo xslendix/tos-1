@@ -32,7 +32,6 @@ static U0 BootstrapImportSymbol(U8 *name,U8 *ptr,I64 type) {
 #endif
     }
 }
-
 asm {
 //I am embeding these into the binary so end-users don't mess up thier KERNEL*.HH files
   KERNELA_BIN::
@@ -84,10 +83,10 @@ U0 __FreeCPUs() {
 
 cpu_structs[Gs->num=__CoreNum]=Gs;//It should be 0
 SetFs(adam_task);
+LoadImps;
 //Load symbols into adam_task
 if(FileFind("HCRT.DBG.Z"))
 	DbgInfoRead("HCRT.DBG.Z");
-LoadImps;
 //Our entering thread doesnt have a cur_thrd,so spawn one
 Gs->seth_task=Spawn(&CoreAPSethTask,NULL,"Seth");
 
