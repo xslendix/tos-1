@@ -177,7 +177,9 @@ char** VFsDir(char const* fn) {
   for (auto const& e : fs::directory_iterator{file}) {
     auto const& s = e.path().filename().string();
     // CDIR_FILENAME_LEN is 38(includes '\0')
-    if (s.size() <= 38-1)
+    // do not touch, fat32 legacy
+    // will break opening ISOs if touched
+    if (s.size() <= 38 - 1)
       items.emplace_back((char*)HolyStrDup(s.c_str()));
   }
   size_t sz = items.size() * sizeof(char*);

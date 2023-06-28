@@ -575,29 +575,29 @@ int64_t STK_VFsDir(int64_t* stk) {
   return (int64_t)VFsDir((char*)stk[0]);
 }
 
-int64_t STK_VFsDel(int64_t* stk) {
+int64_t STK_VFsDel(uintptr_t* stk) {
   return VFsDel((char*)stk[0]);
 }
 
-int64_t STK_VFsFOpenW(int64_t* stk) {
-  return (intptr_t)VFsFOpen((char*)stk[0], "w+b");
+uint64_t STK_VFsFOpenW(uintptr_t* stk) {
+  return (uintptr_t)VFsFOpen((char*)stk[0], "w+b");
 }
 
-int64_t STK_VFsFOpenR(int64_t* stk) {
-  return (intptr_t)VFsFOpen((char*)stk[0], "rb");
+uint64_t STK_VFsFOpenR(uintptr_t* stk) {
+  return (uintptr_t)VFsFOpen((char*)stk[0], "rb");
 }
 
-int64_t STK_VFsFClose(int64_t* stk) {
+int64_t STK_VFsFClose(uintptr_t* stk) {
   fclose((FILE*)stk[0]);
   return 0;
 }
 
-int64_t STK_VFsFBlkRead(int64_t* stk) {
+int64_t STK_VFsFBlkRead(uintptr_t* stk) {
   fflush((FILE*)stk[3]);
   return stk[2] == fread((void*)stk[0], stk[1], stk[2], (FILE*)stk[3]);
 }
 
-int64_t STK_VFsFBlkWrite(int64_t* stk) {
+int64_t STK_VFsFBlkWrite(uintptr_t* stk) {
   bool r = stk[2] == fwrite((void*)stk[0], stk[1], stk[2], (FILE*)stk[3]);
   fflush((FILE*)stk[3]);
   return r;
