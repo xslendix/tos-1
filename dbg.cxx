@@ -95,15 +95,19 @@ static void routine(int sig, siginfo_t* info, ucontext_t* ctx) {
   BackTrace();
   uint64_t sig_i64 = sig;
 #ifdef __linux__
-#define REG(x) ctx->uc_mcontext.gregs[REG_##x]
+#define REG(x) static_cast<uint64_t>(ctx->uc_mcontext.gregs[REG_##x])
   // probably only works on glibc lmao
-  greg_t regs[] = {
+  // clang-format off
+  // heres why i dont take the address of fpregs on linux
+  // https://github.com/bminor/glibc/blob/4290aed05135ae4c0272006442d147f2155e70d7/sysdeps/unix/sysv/linux/x86/sys/ucontext.h#L239
+  // clang-format on
+  uint64_t regs[] = {
       REG(RAX), REG(RCX), REG(RDX),
       REG(RBX), REG(RSP), REG(RBP),
       REG(RSI), REG(RDI), REG(R8),
       REG(R9),  REG(R10), REG(R11),
       REG(R12), REG(R13), REG(R14),
-      REG(R15), REG(RIP), (greg_t)ctx->uc_mcontext.fpregs,
+      REG(R15), REG(RIP), (uintptr_t)ctx->uc_mcontext.fpregs,
       REG(EFL),
   };
 #elif defined(__FreeBSD__)

@@ -79,6 +79,8 @@ void* NewVirtualChunk(size_t sz, bool low32) {
         down = upper;
       }
     found:
+      if (down > UINT32_MAX)
+        return nullptr;
       ret = mmap(reinterpret_cast<void*>(down), sz / ps * ps + pad,
                  PROT_EXEC | PROT_WRITE | PROT_READ,
                  MAP_PRIVATE | MAP_ANON | MAP_FIXED, -1, 0);

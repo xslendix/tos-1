@@ -375,7 +375,7 @@ static void STK_InterruptCore(int64_t* stk) {
   InterruptCore(stk[0]);
 }
 
-static void STK___BootstrapForeachSymbol(int64_t* stk) {
+static void STK___BootstrapForeachSymbol(uintptr_t* stk) {
   for (auto& m : TOSLoader) {
     auto& [symname, vec] = m;
     if (vec.size() == 0)
@@ -640,7 +640,7 @@ static void STK_ExitTOS(int64_t* stk) {
 static void RegisterFunctionPtr(std::string& blob, char const* name, void* fp,
                                 size_t arity) {
   // Function entry point offset from the code blob
-  auto sz = blob.size();
+  uintptr_t off = blob.size();
 #ifdef _WIN32
   // clang-format off
   /*
@@ -754,7 +754,7 @@ static void RegisterFunctionPtr(std::string& blob, char const* name, void* fp,
   blob.push_back((arity >> 8) & 0xFF);
   CHash sym;
   sym.type = HTT_FUN;
-  sym.val = (void*)(uintptr_t)sz;
+  sym.val = reinterpret_cast<void*>(off);
   TOSLoader[name].emplace_back(sym);
 }
 
