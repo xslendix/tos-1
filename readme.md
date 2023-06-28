@@ -11,7 +11,7 @@ pacman -Syu make yasm mingw-w64-x86_64-{gcc,SDL2,cmake,libuv}
 ```
 if pacman tells you to restart the terminal then do it and run the cmd again(rtfm)
 ## unix-like system users
-install SDL2, cmake, make, yasm, gcc/clang(clang preferred) and libuv
+install SDL2, cmake, make, yasm, gcc/clang and libuv
 ## building the loader
 ```
 mkdir build;cd build;

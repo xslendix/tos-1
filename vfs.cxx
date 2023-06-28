@@ -190,11 +190,11 @@ char** VFsDir(char const* fn) {
 }
 
 uint64_t VFsIsDir(char const* path) {
-  return FIsDir(VFsFileNameAbs(p));
+  return FIsDir(VFsFileNameAbs(path));
 }
 
 uint64_t VFsFileExists(char const* path) {
-  return FExists(VFsFileNameAbs(p));
+  return FExists(VFsFileNameAbs(path));
 }
 
 void VFsMountDrive(char const let, char const* path) {
