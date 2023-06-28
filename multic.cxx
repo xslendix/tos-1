@@ -170,7 +170,7 @@ void LaunchCore0(void* (*fp)(void*)) {
   // thread name on windows(https://archive.md/9jiD5)
 #else
   pthread_create(&cores[0].thread, nullptr, fp, nullptr);
-  pthread_setname_np(cores[0].thread, "Seth/Adam(Core0)");
+  pthread_setname_np(cores[0].thread, "Seth(Core0)");
 #endif
 }
 
