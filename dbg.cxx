@@ -112,6 +112,8 @@ static void routine(int sig, siginfo_t* info, ucontext_t* ctx) {
   };
 #elif defined(__FreeBSD__)
 #define REG(X) static_cast<uint64_t>(ctx->uc_mcontext.mc_##X)
+  // freebsd seems to just use an
+  // array of longs for their floating point context lmao
   uint64_t regs[] = {
       REG(rax),    REG(rcx), REG(rdx),
       REG(rbx),    REG(rsp), REG(rbp),

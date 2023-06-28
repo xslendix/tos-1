@@ -246,7 +246,7 @@ static UINT tick_inc;
 static std::atomic<uint64_t> ticks = 0;
 
 // To just get ticks we can use QueryPerformanceFrequency
-// and QueryPerformanceCounter but we cant to set an winmm
+// and QueryPerformanceCounter but we want to set an winmm
 // event that updates the tick count while also helping cores wake up
 //
 // i killed two birds with one stoner
