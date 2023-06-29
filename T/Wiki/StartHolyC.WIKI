@@ -9,15 +9,15 @@ Using the orthodox TempleOS ISO from TempleOS.org is the most standard way to ex
 
 For Linux QEMU is highly recommended.
  qemu-img create -f qcow2 TempleOS.qcow2 2G
- qemu-system-x86_64 -machine pc,kernel-irqchip=off,accel=kvm \
+ qemu-system-x86_64 -machine pc,kernel-irqchip=off,pcspk-audiodev=snd0,accel=kvm \
+                    -audiodev sdl,id=snd0 \
                     -cdrom=<YOUR TEMPLEOS ISO> \
                     -hda TempleOS.qcow2 \
                     -m 2G \
                     -smp $(nproc) \
-                    -rtc base=localtime \
-                    -soundhw pcspk
+                    -rtc base=localtime
 For Windows, !VMWare Workstation is highly recommended. Keep in mind you /must/ disable anything Hyper-V related(Virtual machine platform, Hyper-V, Windows Subsystem for Linux) or else !VMWare Workstation will perform very poorly because it becomes a Hyper-V wrapper instead of using its own hypervisor. !VMWare Workstation 16.0.0 supports !PCSpeaker emulation. 16.2.3 has a hypervisor bug. Make sure you choose 'Compatible with Workstation 8.x' in the custom configuration menu.
-===!This emulator(binary translation layer)
+===!tos(the thing that this server it running on)
 !This emulator is a binary translation layer for Linux, !FreeBSD and Windows to run a full-blown TempleOS environment in userspace without emulation. It is currently only available for !AMD64 FreeBSD/Linux/Windows.
 
 !Development is still in progress, but it will (hopefully) be able to execute all source code in this Wiki without problems. Please contact the owner if it fails to run.

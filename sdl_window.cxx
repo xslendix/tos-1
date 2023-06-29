@@ -184,7 +184,7 @@ static void UserEvHandler(void* a, SDL_UserEvent* ev) {
     DrawWindowUpdate_pre(NULL, (uint8_t*)ev->data1, (uintptr_t)ev->data2, 480);
 }
 
-enum {
+enum : uint8_t {
   CH_CTRLA = 0x01,
   CH_CTRLB = 0x02,
   CH_CTRLC = 0x03,
@@ -220,7 +220,7 @@ enum {
 };
 
 // Scan code flags
-enum {
+enum : uint8_t {
   SCf_E0_PREFIX = 7,
   SCf_KEY_UP = 8,
   SCf_SHIFT = 9,
@@ -237,22 +237,22 @@ enum {
   SCf_NO_SHIFT = 30,
   SCf_KEY_DESC = 31,
 };
-enum {
-  SCF_E0_PREFIX = 1 << SCf_E0_PREFIX,
-  SCF_KEY_UP = 1 << SCf_KEY_UP,
-  SCF_SHIFT = 1 << SCf_SHIFT,
-  SCF_CTRL = 1 << SCf_CTRL,
-  SCF_ALT = 1 << SCf_ALT,
-  SCF_CAPS = 1 << SCf_CAPS,
-  SCF_NUM = 1 << SCf_NUM,
-  SCF_SCROLL = 1 << SCf_SCROLL,
-  SCF_NEW_KEY = 1 << SCf_NEW_KEY,
-  SCF_MS_L_DOWN = 1 << SCf_MS_L_DOWN,
-  SCF_MS_R_DOWN = 1 << SCf_MS_R_DOWN,
-  SCF_DELETE = 1 << SCf_DELETE,
-  SCF_INS = 1 << SCf_INS,
-  SCF_NO_SHIFT = 1 << SCf_NO_SHIFT,
-  SCF_KEY_DESC = 1 << SCf_KEY_DESC,
+enum : uint64_t {
+  SCF_E0_PREFIX = 1ul << SCf_E0_PREFIX,
+  SCF_KEY_UP = 1ul << SCf_KEY_UP,
+  SCF_SHIFT = 1ul << SCf_SHIFT,
+  SCF_CTRL = 1ul << SCf_CTRL,
+  SCF_ALT = 1ul << SCf_ALT,
+  SCF_CAPS = 1ul << SCf_CAPS,
+  SCF_NUM = 1ul << SCf_NUM,
+  SCF_SCROLL = 1ul << SCf_SCROLL,
+  SCF_NEW_KEY = 1ul << SCf_NEW_KEY,
+  SCF_MS_L_DOWN = 1ul << SCf_MS_L_DOWN,
+  SCF_MS_R_DOWN = 1ul << SCf_MS_R_DOWN,
+  SCF_DELETE = 1ul << SCf_DELETE,
+  SCF_INS = 1ul << SCf_INS,
+  SCF_NO_SHIFT = 1ul << SCf_NO_SHIFT,
+  SCF_KEY_DESC = 1ul << SCf_KEY_DESC,
 };
 
 // TempleOS places a 1 in bit 7 for
@@ -260,7 +260,7 @@ enum {
 // See \dLK,"::/Doc/CharOverview.DD"\d
 // and
 // \dLK,"KbdHndlr",A="MN:KbdHndlr"\d().
-enum {
+enum : uint8_t {
   SC_ESC = 0x01,
   SC_BACKSPACE = 0x0E,
   SC_TAB = 0x0F,

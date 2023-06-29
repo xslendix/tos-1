@@ -58,7 +58,7 @@ static int FIsDir(std::string const& path) {
   return fs::is_directory(path);
 }
 
-uint64_t VFsCd(char const* to, int const flags) {
+uint64_t VFsDirMk(char const* to, int const flags) {
   std::string p = VFsFileNameAbs(to);
   if (FExists(p) && FIsDir(p)) {
     return 1;

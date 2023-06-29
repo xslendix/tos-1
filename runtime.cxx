@@ -567,12 +567,12 @@ int64_t STK_VFsFWrite(int64_t* stk) {
   return VFsFileWrite((char*)stk[0], (char*)stk[1], stk[2]);
 }
 
-int64_t STK_VFsDirMk(int64_t* stk) {
-  return VFsCd((char*)stk[0], VFS_CDF_MAKE);
+uint64_t STK_VFsDirMk(uintptr_t* stk) {
+  return VFsDirMk((char*)stk[0], VFS_CDF_MAKE);
 }
 
-int64_t STK_VFsDir(int64_t* stk) {
-  return (int64_t)VFsDir((char*)stk[0]);
+uint64_t STK_VFsDir(uintptr_t* stk) {
+  return (uintptr_t)VFsDir((char*)stk[0]);
 }
 
 int64_t STK_VFsDel(uintptr_t* stk) {

@@ -1,6 +1,7 @@
 # templeos in ring 3
 ### you ***must*** already know the basics of templeos before attempting to use this
 ### readme is intentionally minimalistic as an entry barrier
+"tos" in lowercase in this project's codebase and Wiki does not refer to TempleOS' abbreviation, it refers to this emulator
 
 # building
 ## windows users
@@ -21,8 +22,7 @@ make -j$(nproc);
 ```
 # build runtime
 ```
-cp HCRT_BOOTSTRAP.BIN HCRT.BIN
-./tos -ctT BuildHCRT.HC
+./tos -f HCRT_BOOTSTRAP.BIN -ctT BuildHCRT.HC
 mv T/HCRT.BIN .
 ```
 # run
@@ -30,7 +30,7 @@ mv T/HCRT.BIN .
 ./tos -t T #-h for info on other flags
 ```
 # caveats
-due to running in userspace, context switching is around 4 times slower(not that it matters anyway outside of flexing `CPURep(TRUE);` results) <br>
+due to running in userspace, context switching is around 4 times slower(not that it matters anyway outside of flexing `CPURep(TRUE);` results) and ring 0 routines like In/OutU8 are not present <br>
 division by zero is not an exception, it will bring up the debugger(SIGFPE)
 
 # documentation
@@ -41,18 +41,17 @@ Cd("T:/Server");
 ```
 contributions to wiki appreciated
 
-# Building TempleOS from tos
-Because this runtime uses the orthodox version of the HolyC compiler,you can build a TempleOS distro from the `/Boot/DoDistro.HC` file
-
-The ISO must end in `.ISO.C`,so here is an example session
+# building TempleOS from tos
+because this runtime uses the orthodox version of the HolyC compiler,building a TempleOS distro is possible(why) <br>
+ISO must end in `ISO.C`
 
 ```
 //Download an orthodox ISO into your T drive from TempleOS.org
 Move("TempleOSLite.ISO","TempleOSLite.ISO.C"); //Move it to end in ISO.C
 #include "Boot/DoDistro.HC";
 MakeMyISO("/TempleOSLite.ISO.C","/MyDistro.ISO.C");
-ExitTOS;
-//Run the ISO using qemu -m 512M -cdrom t/MyDistro.ISO.C
+//ExitTOS; optionally exit tos idk
+//Run the ISO using qemu -m 512M -cdrom T/MyDistro.ISO.C
 ```
 
 # ref

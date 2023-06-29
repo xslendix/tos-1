@@ -3,8 +3,6 @@
 #include <fstream>
 #include <ios>
 using std::ios;
-#include <filesystem>
-namespace fs = std::filesystem;
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -64,13 +62,13 @@ void* NewVirtualChunk(size_t sz, bool low32) {
       uintptr_t down = 0x1000;
       std::ifstream map{"/proc/self/maps", ios::binary | ios::in};
       std::string buffer;
+      // just fs::file_size() wont work lmao
       while (std::getline(map, buffer)) {
         char const* ptr = buffer.data();
         uint64_t lower = Hex2U64(ptr, &ptr);
         // basically finds a gap between the previous line's upper address
         // and the current line's lower address so it can allocate there
-        if (lower <= UINT32_MAX && (lower - down) >= (sz / ps * ps + pad) &&
-            lower > down) {
+        if (lower - down >= sz / ps * ps + pad && lower > down) {
           goto found;
         }
         // ignore '-'

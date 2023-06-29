@@ -12,7 +12,7 @@
 void VFsThrdInit();
 void VFsSetDrv(char const d);
 void VFsSetPwd(char const* pwd);
-uint64_t VFsCd(char const* to, int const flags);
+uint64_t VFsDirMk(char const* to, int const flags);
 uint64_t VFsDel(char const* p);
 std::string VFsFileNameAbs(char const* name);
 int64_t VFsUnixTime(char const* name);
