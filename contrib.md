@@ -1,20 +1,21 @@
 # ffi
-runtime.c
+runtime.cxx
 ```C
-sizeof(each arg)==sizeof(uint64_t)//use ptrs
-FFI_CALL_TOS_?(uint64 (*)(...),uint64_t,...);
-STK_RegisterFunctionPtr(&ffi_blob,"<tos func name>",uint64_t (*)(Ts...args),sizeof...(Ts)/*important or will segv*/);
+uint64_t STK_FunctionName(uint64_t* stk) {
+  // ...
+}
+S_(FunctionName, function arg cnt);
 ```
 T/KERNELA.HH
 ```C
 ...after #ifdef IMPORT_BUILTINS
-import U64i f(....);
+import U64i FunctionName(....);
 ...#else then lots of extern
 extern <same function prototype>;
 //F64 -> ok
 //U64 -> bad, use U64i
 ```
-make again with cmake
+build hcrt and loader again
 # extending the kernel
 T/KERNELA.HH
 ```C
