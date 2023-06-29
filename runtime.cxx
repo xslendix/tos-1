@@ -309,7 +309,7 @@ static void STK__GrPaletteColorSet(int64_t* stk) {
   GrPaletteColorSet(stk[0], stk[1]);
 }
 
-static uint64_t IsValidPtr(uintptr_t* stk) {
+static uint64_t STK___IsValidPtr(uintptr_t* stk) {
 #ifdef _WIN32
   // Wine doesnt like the
   // IsBadReadPtr,so use a polyfill
@@ -529,7 +529,7 @@ uint64_t mp_cnt(int64_t*) {
   return thread::hardware_concurrency();
 }
 
-void SpawnCore(int64_t* stk) {
+void STK___SpawnCore(int64_t* stk) {
   CreateCore(stk[0], (void*)stk[1]);
 }
 
@@ -768,12 +768,12 @@ void RegisterFuncPtrs() {
   R_("__CmdLineBootText", CmdLineBootText, 0);
   R_("__IsCmdLine", IsCmdLine, 0);
   R_("mp_cnt", mp_cnt, 0);
-  R_("__SpawnCore", SpawnCore, 2);
   R_("__CoreNum", CoreNum, 0);
   R_("GetFs", GetFs, 0);
   R_("GetGs", GetGs, 0);
-  R_("__IsValidPtr", IsValidPtr, 1);
   R_("DrawWindowNew", NewDrawWindow, 0);
+  S_(__IsValidPtr, 1);
+  S_(__SpawnCore, 0);
   S_(UnixNow, 0);
   S_(InterruptCore, 1);
   S_(NewVirtualChunk, 2);

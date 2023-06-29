@@ -9,7 +9,7 @@ U0 cb(CUVRandom*,I32 status,U8 *buf,U64 sz) {
   '\n';
 }
 
-U0 Main() {
+U0 Main() {
   U8 buf[1024];
   CUVLoop   *l=UVLoopNew;
   CUVRandom *r=UVRandomNew;
