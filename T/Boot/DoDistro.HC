@@ -80,6 +80,7 @@ inv_file:
 //  Unmount(drv1);
 }
 
-MakeMyISO("/TempleOSLite.ISO.C","/MyDistro.ISO.C");
+//MakeMyISO("/TempleOSLite.ISO.C","/MyDistro.ISO.C");
 
 // Study my account examples $LK,"Cfg Strs",A="FL:::/Demo/AcctExample/TOS/TOSCfg.HC,1"$, $LK,"Update Funs",A="FL:::/Demo/AcctExample/TOS/TOSDistro.HC,1"$.
+

@@ -41,6 +41,20 @@ Cd("T:/Server");
 ```
 contributions to wiki appreciated
 
+# Building TempleOS from tos
+Because this runtime uses the orthodox version of the HolyC compiler,you can build a TempleOS distro from the `/Boot/DoDistro.HC` file
+
+The ISO must end in `.ISO.C`,so here is an example session
+
+```
+//Download an orthodox ISO into your T drive from TempleOS.org
+Move("TempleOSLite.ISO","TempleOSLite.ISO.C"); //Move it to end in ISO.C
+#include "Boot/DoDistro.HC";
+MakeMyISO("/TempleOSLite.ISO.C","/MyDistro.ISO.C");
+ExitTOS;
+//Run the ISO using qemu -m 512M -cdrom t/MyDistro.ISO.C
+```
+
 # ref
 ```C
 DirMk("folder");
