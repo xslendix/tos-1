@@ -10,8 +10,24 @@ public extern CAutoCompleteGlbls ac;
 public extern CAutoCompleteDictGlbls acd;
 
 #help_index "Bit"
+#help_file "::/Doc/Bit"
 public extern I64 BCnt(I64 d);
 public extern U8 *rev_bits_table,*set_bits_table;
+public extern I64 Bsf(I64 bit_field_val);//Scan fwd from lowest for 1st set. -1 if not found.
+public extern I64 Bsr(I64 bit_field_val);//Scan rev from highest for 1st set. -1 if not found.
+public extern Bool Bt(U8 *bit_field,I64 bit); //Bit test.
+public extern Bool Btc(U8 *bit_field,I64 bit); //Bit test and complement (same as xor with 1).
+public extern Bool Btr(U8 *bit_field,I64 bit); //Bit test and reset to zero.
+public extern Bool Bts(U8 *bit_field,I64 bit); //Bit test and set to one.
+public extern Bool LBtc(U8 *bit_field,I64 bit); //Locked bit test and complement (xor with 1).
+public extern Bool LBtr(U8 *bit_field,I64 bit); //Locked bit test and reset to zero.
+public extern Bool LBts(U8 *bit_field,I64 bit); //Locked bit test and set to one.
+public extern Bool BEqu(U8 *bit_field,I64 bit,Bool val);//Set bit equ to val.
+public extern U32 BFieldExtU32(U8 *bit_field,I64 bit,I64 size); //Extract U32 from bit field.
+public extern U0 BFieldOrU32(U8 *bit_field,I64 bit,U32 pattern); //Or U32 into bit field.
+public extern Bool LBEqu(U8 *bit_field,I64 bit,Bool val); //Locked Set bit equ to val.
+
+
 
 #help_index "Boot"
 #help_file "::/Doc/Boot"

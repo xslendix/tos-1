@@ -4156,6 +4156,7 @@ public _intern IC_PUSH U0 Push(I64 d); //Push value on stk.
 public _intern IC_SET_RAX U0 SetRAX(I64 d); //Set RAX register value.
 public _intern IC_SET_RBP U0 SetRBP(U8 *d); //Set RBP register value.
 public _intern IC_SET_RFLAGS U0 SetRFlags(I64 d); //Set RFlags register value.
+
 public _intern IC_BSF I64 Bsf(
 	I64 bit_field_val);//Scan fwd from lowest for 1st set. -1 if not found.
 public _intern IC_BSR I64 Bsr(
@@ -4174,6 +4175,8 @@ public _intern IC_LBTR Bool LBtr(
 	U8 *bit_field,I64 bit); //Locked bit test and reset to zero.
 public _intern IC_LBTS Bool LBts(
 	U8 *bit_field,I64 bit); //Locked bit test and set to one.
+
+
 public _intern IC_TOUPPER I64 ToUpper(U8 ch); //Cvt char to upper case.
 public _intern IC_STRLEN I64 StrLen(U8 *st); //String length.
 public _intern IC_QUE_INIT U0 QueInit(
@@ -6547,7 +6550,7 @@ extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL);
 extern I64 FileWrite(U8 *filename,U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0);
 extern CDirEntry *VirtFilesFind(U8 *files_find_mask,I64 fuf_flags,
 	CDirEntry *parent=NULL);
-public extern U8 MountFile(U8 *filename,U8 drv_let='M');
+public extern U8 MountFile(U8 *filename,U8 drv_let='M');
 public extern U0 Unmount(U8 drv_let=0);
 extern CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_head,Bool init);
 extern U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_head,I64 mode);
