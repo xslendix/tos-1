@@ -237,22 +237,23 @@ enum : uint8_t {
   SCf_NO_SHIFT = 30,
   SCf_KEY_DESC = 31,
 };
-enum : uint64_t {
-  SCF_E0_PREFIX = 1ul << SCf_E0_PREFIX,
-  SCF_KEY_UP = 1ul << SCf_KEY_UP,
-  SCF_SHIFT = 1ul << SCf_SHIFT,
-  SCF_CTRL = 1ul << SCf_CTRL,
-  SCF_ALT = 1ul << SCf_ALT,
-  SCF_CAPS = 1ul << SCf_CAPS,
-  SCF_NUM = 1ul << SCf_NUM,
-  SCF_SCROLL = 1ul << SCf_SCROLL,
-  SCF_NEW_KEY = 1ul << SCf_NEW_KEY,
-  SCF_MS_L_DOWN = 1ul << SCf_MS_L_DOWN,
-  SCF_MS_R_DOWN = 1ul << SCf_MS_R_DOWN,
-  SCF_DELETE = 1ul << SCf_DELETE,
-  SCF_INS = 1ul << SCf_INS,
-  SCF_NO_SHIFT = 1ul << SCf_NO_SHIFT,
-  SCF_KEY_DESC = 1ul << SCf_KEY_DESC,
+
+enum : uint32_t {
+  SCF_E0_PREFIX = 1u << SCf_E0_PREFIX,
+  SCF_KEY_UP = 1u << SCf_KEY_UP,
+  SCF_SHIFT = 1u << SCf_SHIFT,
+  SCF_CTRL = 1u << SCf_CTRL,
+  SCF_ALT = 1u << SCf_ALT,
+  SCF_CAPS = 1u << SCf_CAPS,
+  SCF_NUM = 1u << SCf_NUM,
+  SCF_SCROLL = 1u << SCf_SCROLL,
+  SCF_NEW_KEY = 1u << SCf_NEW_KEY,
+  SCF_MS_L_DOWN = 1u << SCf_MS_L_DOWN,
+  SCF_MS_R_DOWN = 1u << SCf_MS_R_DOWN,
+  SCF_DELETE = 1u << SCf_DELETE,
+  SCF_INS = 1u << SCf_INS,
+  SCF_NO_SHIFT = 1u << SCf_NO_SHIFT,
+  SCF_KEY_DESC = 1u << SCf_KEY_DESC,
 };
 
 // TempleOS places a 1 in bit 7 for
