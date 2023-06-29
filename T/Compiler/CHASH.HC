@@ -297,6 +297,12 @@ I64 FramePtrDel(U8 *name,CTask *t=NULL)
  *          U32 star_cnt
  *          U32 total_dim //I64 array[3][4] would have total_dim of 12
  *
+ * if(HTT_GLBL_VAR)
+ *     VAR_NAME(U8[])
+ *     VAR_FILE(U8[])
+ *     VAR_HELP_IDX(U8[])
+ *     I64 ln
+ * 
  * if(HTT_HELP_FILE)
  *     POINTS_TO_FILE(U8[])
  *     HELP_IDX(U8[])
@@ -329,9 +335,11 @@ I64 __DbgInfoWrite(CHashTable *h,U8 *to) {
 	  size+=StrLen(tmph->str)+1;
 	  if(to) StrCpy(to+size,buffer);
 	  size+=StrLen(buffer)+1;
+//Heres the deal,at the end of the compile,I have a PUBLIC.HC where all the #help_indexes are
+	  //because this is the last file,I will use the most recent version of the symbol's help idx
 	  pub_tmph=HashFind(tmph->str,h,HTF_PUBLIC);
-          if(pub_tmph) {
-	    if(pub_tmph->idx) {
+	  if(pub_tmph) {
+	    if(pub_tmph->idx&&pub_tmph->str&HTF_PUBLIC) {
 	      if(to) StrCpy(to+size,pub_tmph->idx);
 	      size+=StrLen(pub_tmph->idx)+1;
 	      goto wrote_help_idx;
@@ -368,23 +376,23 @@ wrote_help_idx:
 	  for(;fun_mem;fun_mem=fun_mem->next) {
 	    if(to) StrCpy(to+size,fun_mem->str);
 	    size+=StrLen(fun_mem->str)+1;
-            tmpc=fun_mem->member_class;
-            tmpc-=tmpc->ptr_stars_cnt;
-            if(tmpc->str) {
+	    tmpc=fun_mem->member_class;
+	    tmpc-=tmpc->ptr_stars_cnt;
+	    if(tmpc->str) {
 	      if(to) StrCpy(to+size,tmpc->str);
 	      size+=StrLen(tmpc->str)+1;
-            } else {
-              if(to) to[size]=0;
-              size++;
-            }
+	    } else {
+	      if(to) to[size]=0;
+	      size++;
+	    }
 	    if(to) (to+size)(U32*)[0]=fun_mem->reg;
 	    size+=4;
 	    if(to) (to+size)(U32*)[0]=fun_mem->offset;
 	    size+=4;
-            if(to) (to+size)(U32*)[0]=fun_mem->member_class->ptr_stars_cnt;
-            size+=4;
-            if(to) (to+size)(U32*)[0]=fun_mem->dim.total_cnt;
-            size+=4;
+	    if(to) (to+size)(U32*)[0]=fun_mem->member_class->ptr_stars_cnt;
+	    size+=4;
+	    if(to) (to+size)(U32*)[0]=fun_mem->dim.total_cnt;
+	    size+=4;
 	  }
         }
       } else if(tmph->type&HTT_HELP_FILE){
@@ -394,6 +402,34 @@ wrote_help_idx:
         size+=StrLen(tmph->str)+1;
         if(to) StrCpy(to+size,tmph->idx);
         size+=StrLen(tmph->idx)+1;
+      } else if(tmph->type&HTF_PUBLIC&&tmph->type&HTT_GLBL_VAR&&!Bt(&tmph(CHashClass*)->flags,Cf_EXTERN)) {
+        if(to) (to+size)(I64*)[0]=HTT_GLBL_VAR;
+        size+=sizeof(I64);
+        StrScan(tmph->src_link,"FL:%s,%d",&bptr,&ln);
+        if(to) StrCpy(to+size,tmph->str);
+        size+=StrLen(tmph->str)+1;
+        if(to) StrCpy(to+size,buffer);
+        size+=StrLen(buffer)+1;
+//Heres the deal,at the end of the compile,I have a PUBLIC.HC where all the #help_indexes are
+        //because this is the last file,I will use the most recent version of the symbol's help idx
+        pub_tmph=HashFind(tmph->str,h,HTF_PUBLIC);
+        if(pub_tmph) {
+	  if(pub_tmph->idx&&pub_tmph->str&HTF_PUBLIC) {
+	    if(to) StrCpy(to+size,pub_tmph->idx);
+	    size+=StrLen(pub_tmph->idx)+1;
+	    goto wrote_help_idx2;
+	  }
+        }
+        if(tmph->idx) {
+	  if(to) StrCpy(to+size,tmph->idx);
+	  size+=StrLen(tmph->idx)+1;
+        } else {
+	  if(to) StrCpy(to+size,"");
+	  size+=StrLen("")+1;
+        }
+wrote_help_idx2:
+        if(to) to[size](I64)=ln;
+        size+=8;
       }
   }
   return size;
@@ -415,7 +451,29 @@ U0 DbgInfoRead(U8 *name) {
   while(ptr<body+len) {
     type=ptr(I64*)[0];
     ptr+=8;
-    if(type&HTT_FUN) {
+    if(type&HTT_GLBL_VAR) {
+      tmph=HashFind(ptr,Fs->hash_table,HTT_GLBL_VAR);
+      if(!tmph) {
+        tmph=CAlloc(sizeof(CHashFun));
+        tmph->str=StrNew(ptr);
+        tmph->type=HTT_UNIMP_FUN;
+      }
+      tmph->type|=HTF_RESOLVE;
+      ptr+=StrLen(ptr)+1;
+      fn=ptr;
+      ptr+=StrLen(ptr)+1;
+      idx=ptr;
+      ptr+=StrLen(ptr)+1;
+      min=ptr(I64*)[0];
+      ptr+=8;
+      Free(tmph->idx);
+      Free(tmph->src_link);
+      tmph->src_link=MStrPrint("FL:%s,%d",fn,min);
+      if(StrLen(idx))
+        tmph->idx=StrNew(idx);
+      else
+        tmph->idx=NULL;
+    } else if(type&HTT_FUN) {
       tmph=HashFind(ptr,Fs->hash_table,HTT_FUN);
       if(!tmph) {
         tmph=CAlloc(sizeof(CHashFun));
@@ -500,3 +558,4 @@ U0 DbgInfoRead(U8 *name) {
   }
   Free(body);
 }
+

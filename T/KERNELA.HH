@@ -4143,6 +4143,7 @@ public class CInsReg
   I64	host_vm		format "Host VM:\dLS,D=\"ST_HOST_VMS\"\d\n";
   U8	initials[8]	format "\dDA-P,A=\"Your Initials:%s\"\d\n";
   I64	machine_num	format
+
 			"\dDA-TRM,A=\"This Machine Num (Choose Any):%d\"\d\n";
 };
 #ifdef FPTRS
@@ -4156,7 +4157,8 @@ public _intern IC_PUSH U0 Push(I64 d); //Push value on stk.
 public _intern IC_SET_RAX U0 SetRAX(I64 d); //Set RAX register value.
 public _intern IC_SET_RBP U0 SetRBP(U8 *d); //Set RBP register value.
 public _intern IC_SET_RFLAGS U0 SetRFlags(I64 d); //Set RFlags register value.
-
+#help_index "Bit"
+#help_file "::/Doc/Bit.DD";
 public _intern IC_BSF I64 Bsf(
 	I64 bit_field_val);//Scan fwd from lowest for 1st set. -1 if not found.
 public _intern IC_BSR I64 Bsr(
@@ -4175,7 +4177,7 @@ public _intern IC_LBTR Bool LBtr(
 	U8 *bit_field,I64 bit); //Locked bit test and reset to zero.
 public _intern IC_LBTS Bool LBts(
 	U8 *bit_field,I64 bit); //Locked bit test and set to one.
-
+#help_index ""
 
 public _intern IC_TOUPPER I64 ToUpper(U8 ch); //Cvt char to upper case.
 public _intern IC_STRLEN I64 StrLen(U8 *st); //String length.

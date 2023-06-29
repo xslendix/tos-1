@@ -3,7 +3,6 @@
 #include <fstream>
 #include <ios>
 using std::ios;
-#include <iostream>
 #include <memory>
 #include <utility>
 
@@ -115,8 +114,7 @@ void* NewVirtualChunk(size_t sz, bool low32) {
                             PAGE_EXECUTE_READWRITE);
       }
     }
-    std::cerr << "Out of 32bit virtual address space\n";
-    std::terminate();
+    return nullptr;
   } else // data heap
     return VirtualAlloc(NULL, sz, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 #endif
