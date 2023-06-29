@@ -601,10 +601,10 @@ static int SDLCALL MSCallback(void* d, SDL_Event* e) {
 
 void SetMSCallback(void* fptr) {
   ms_cb = fptr;
-  if (!ms_init) {
-    ms_init = true;
-    SDL_AddEventWatch(MSCallback, NULL);
-  }
+  if (ms_init)
+    return;
+  ms_init = true;
+  SDL_AddEventWatch(MSCallback, NULL);
 }
 
 static int ExitCb(void* off, SDL_Event* event) {
