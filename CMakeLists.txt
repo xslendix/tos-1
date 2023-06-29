@@ -56,8 +56,23 @@ project(tos
 message(STATUS "${PROJECT_NAME} version: ${VERSION_SIMPLE}")
 option(WARNINGS_AS_ERRORS "Set certain warnings to be treated as errors by the compiler" ON)
 
-set(CPP_EXECUTABLE_SOURCE_FILES main.cxx dbg.cxx sdl_window.cxx runtime.cxx tos_aot.cxx mem.cxx multic.cxx vfs.cxx TOSPrint.cxx)
-set(C_EXECUTABLE_SOURCE_FILES sound.c ext/dyad.c ext/argtable3.c)
+set(CPP_EXECUTABLE_SOURCE_FILES
+  main.cxx
+  dbg.cxx
+  sdl_window.cxx
+  runtime.cxx
+  tos_aot.cxx
+  mem.cxx
+  multic.cxx
+  vfs.cxx
+  TOSPrint.cxx
+)
+
+set(C_EXECUTABLE_SOURCE_FILES
+  sound.c
+  ext/dyad.c
+  ext/argtable3.c
+)
 
 set_source_files_properties(CPP_EXECUTABLE_SOURCE_FILES
   PROPERTIES
