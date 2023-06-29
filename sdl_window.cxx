@@ -625,8 +625,8 @@ void InputLoop(bool* off) {
   }
 }
 
-// please policeman am i under arrest? read me my rights please! I WANT MY PHONE
-// CALL!!!
+// please policeman am i under arrest? read me my rights please!
+// I WANT MY PHONE CALL!!!
 extern "C" union bgr_48 {
   struct __attribute__((packed)) {
     uint16_t b, g, r, pad;
