@@ -1,7 +1,7 @@
 # templeos in ring 3
 ### you ***must*** already know the basics of templeos before attempting to use this
-### readme is intentionally minimalistic as an entry barrier
-"tos" in lowercase in this project's codebase and Wiki does not refer to TempleOS' abbreviation, it refers to this emulator
+"tos" in lowercase in this project's codebase and Wiki does not refer to TempleOS' abbreviation, it refers to this project(runtime/loader) <br>
+it's hard to describe what this exactly is because it doesn't "emulate" anything in the traditional sense, though it loads a mostly orthodox kernel and can compile/run HolyC software as you would on a real bare metal machine as it runs Terry's compiler and emits machine code that's executed directly on the host CPU
 
 # building
 ## windows users
@@ -66,7 +66,9 @@ Unzip("file.HC.Z");//unzip tos compression
 Zip("file.HC");
 Find("str",,"-i");//grep -rn . -e str
 FF("file.*");//find .|grep file
-DbgHelp;//help on how to debug
+MountFile("Something.ISO.C");//MountFile(U8 *f,U8 drv_let='M');
+Cd("M:/");//defaults to M
 INT3;//force raise debug situation
+DbgHelp;//help on how to debug
 ExitTOS(I32i ec=0);
 ```

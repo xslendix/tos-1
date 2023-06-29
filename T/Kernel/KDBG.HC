@@ -78,7 +78,7 @@ U0 FaultCB(U8 **rbp,U8 *fptr) {
         TOSPrint("[%d] %s\n",0,ln);
     Free(ln);
     
-    for (bt=1;bt<=5;bt++) {
+    for (bt=0;bt<=5;bt++) {
         ln=SrcEdLink(__CallerBP(rbp,bt));
         if (!ln) ln=StrNew("???");
         f=FunSegFind(__CallerBP(rbp,bt),NULL);
@@ -142,7 +142,7 @@ U0 DebuggerLandWin(I64 sig,I64 *gps) {
   FaultCB(gps[5],gps[16]);
   UnblockSignals;
   if(Fs==sys_winmgr_task) {
-    //Oh no,you crashed the window manager
+    //Oh no,you crashed the window manager
     TOSPrint("You crashed the window manager,aborting\n");
     ExitTOS;
   }

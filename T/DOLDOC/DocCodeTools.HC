@@ -470,7 +470,7 @@ U0 EdCodeTools2(CDoc *doc,I64 tool_action,Bool beep=TRUE)
 	  st=DirFile(doc->filename.name,"Load","HC.Z");
 	  prj_file=FileNameAbs(st);
 	  Free(st);
-	  //Changed for this emulator.DirFile used to strip filename from file(but might be re-introduced so
+	  //Changed for tos.DirFile used to strip filename from file(but might be re-introduced so
           // leaving this here),so if we are in the root direction,we will return root
 	  //
 	  // Here is an example:

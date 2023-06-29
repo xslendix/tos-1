@@ -255,31 +255,31 @@ static void DyadListenCB(dyad_Event* e) {
 static void DyadCloseCB(dyad_Event* e) {
   FFI_CALL_TOS_2(e->udata, (uintptr_t)e->stream, (uintptr_t)e->udata2);
 }
-static void STK_DyadSetCloseCallback(int64_t* stk) {
+static void STK_DyadSetOnCloseCallback(int64_t* stk) {
   dyad_addListener((dyad_Stream*)stk[0], DYAD_EVENT_CLOSE, &DyadCloseCB,
                    (void*)stk[1], (void*)stk[2]);
 }
-static void STK_DyadSetConnectCallback(int64_t* stk) {
+static void STK_DyadSetOnConnectCallback(int64_t* stk) {
   dyad_addListener((dyad_Stream*)stk[0], DYAD_EVENT_CONNECT, &DyadListenCB,
                    (void*)stk[1], (void*)stk[2]);
 }
-static void STK_DyadSetDestroyCallback(int64_t* stk) {
+static void STK_DyadSetOnDestroyCallback(int64_t* stk) {
   dyad_addListener((dyad_Stream*)stk[0], DYAD_EVENT_DESTROY, &DyadCloseCB,
                    (void*)stk[1], (void*)stk[2]);
 }
-static void STK_DyadSetErrorCallback(int64_t* stk) {
+static void STK_DyadSetOnErrorCallback(int64_t* stk) {
   dyad_addListener((dyad_Stream*)stk[0], DYAD_EVENT_ERROR, &DyadCloseCB,
                    (void*)stk[1], (void*)stk[2]);
 }
-static void STK_DyadSetReadyCallback(int64_t* stk) {
+static void STK_DyadSetOnReadyCallback(int64_t* stk) {
   dyad_addListener((dyad_Stream*)stk[0], DYAD_EVENT_READY, &DyadListenCB,
                    (void*)stk[1], (void*)stk[2]);
 }
-static void STK_DyadSetTickCallback(int64_t* stk) {
+static void STK_DyadSetOnTickCallback(int64_t* stk) {
   dyad_addListener((dyad_Stream*)stk[0], DYAD_EVENT_TICK, &DyadListenCB,
                    (void*)stk[1], (void*)stk[2]);
 }
-static void STK_DyadSetTimeoutCallback(int64_t* stk) {
+static void STK_DyadSetOnTimeoutCallback(int64_t* stk) {
   dyad_addListener((dyad_Stream*)stk[0], DYAD_EVENT_TIMEOUT, &DyadListenCB,
                    (void*)stk[1], (void*)stk[2]);
 }
@@ -815,13 +815,13 @@ void RegisterFuncPtrs() {
   S_(DyadGetAddress, 1);
   S_(DyadSetReadCallback, 3);
   S_(DyadSetOnListenCallback, 3);
-  S_(DyadSetConnectCallback, 3);
-  S_(DyadSetCloseCallback, 3);
-  S_(DyadSetReadyCallback, 3);
-  S_(DyadSetTimeoutCallback, 3);
-  S_(DyadSetTimeoutCallback, 3);
-  S_(DyadSetErrorCallback, 3);
-  S_(DyadSetDestroyCallback, 3);
+  S_(DyadSetOnConnectCallback, 3);
+  S_(DyadSetOnCloseCallback, 3);
+  S_(DyadSetOnReadyCallback, 3);
+  S_(DyadSetOnTimeoutCallback, 3);
+  S_(DyadSetOnTickCallback, 3);
+  S_(DyadSetOnErrorCallback, 3);
+  S_(DyadSetOnDestroyCallback, 3);
   S_(DyadSetTimeout, 2);
   S_(DyadSetNoDelay, 2);
   S_(VFsFTrunc, 2);

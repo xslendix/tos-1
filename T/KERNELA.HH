@@ -1,6 +1,6 @@
 // Main TempleOS header
 //
-// These are modified for this emulator; they dont take CTask * as an argument
+// These are modified for tos; they dont take CTask * as an argument
 //
 #define __TOS_EMUL__ TRUE
 extern class CDrawWin;
@@ -3391,7 +3391,7 @@ class CBpt
   CBpt	*next;
   U8	*addr,
 	val,
-	is_tmp, //Changed in this emul
+	is_tmp, //Changed in tos
 	pad[6];
 };
 
@@ -3519,7 +3519,7 @@ public class CTaskSettings
 #define TASKf_KILL_AFTER_DBG	13
 
 #define TASKf_NONTIMER_RAND	14
-//Added in this emul
+//Added in tos 
 #define TASKf_JUST_STEPPED 15
 
 //CTask.display_flags
@@ -6540,14 +6540,14 @@ extern CDrv *DrvChk(CDrv *dv,Bool except=TRUE);
 extern U8 DrvTextAttrGet(U8 drv_let=0);
 extern Bool DrvTypeSet(U8 drv_let,I64 type=FSt_REDSEA);
 extern U0 DrvsRelease();
-extern U0 DskCacheInvalidate(CDrv *dv);
+extern U0 DskCacheInvalidate(CDrv *dv);
 extern U8 *FileExtRem(U8 *src,U8 *dst=NULL);
 extern U8 *FileNameAbs(U8 *_filename,I64 fuf_flags=0);
 extern U8 *FileRead(U8 *filename,I64 *_size=NULL,I64 *_attr=NULL);
 extern I64 FileWrite(U8 *filename,U8 *fbuf,I64 size,CDate cdt=0,I64 attr=0);
 extern CDirEntry *VirtFilesFind(U8 *files_find_mask,I64 fuf_flags,
 	CDirEntry *parent=NULL);
-public extern U8 MountFile(U8 *filename);
+public extern U8 MountFile(U8 *filename,U8 drv_let='M');
 public extern U0 Unmount(U8 drv_let=0);
 extern CDirEntry *FMRebuildDocDrv(U8 drv_let,CDoc *doc,CDirEntry **_head,Bool init);
 extern U0 FMRebuildDoc(CDoc **_doc,CDirEntry **_head,I64 mode);
