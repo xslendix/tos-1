@@ -158,9 +158,8 @@ int main(int argc, char** argv) {
     if (cb_sanitize->count > 0)
       sanitize_clipboard = true;
     InputLoop(&prog_exit);
-  } else {
+  } else
     WaitForCore0();
-    FFI_CALL_TOS_0(TOSLoader["__FreeCPUs"][0].val);
-  }
+  FFI_CALL_TOS_0(TOSLoader["__FreeCPUs"][0].val);
   return 0;
 }

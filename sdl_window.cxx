@@ -1,3 +1,4 @@
+#include "sdl_window.hxx"
 #include "ffi.h"
 #include "logo.hxx"
 #include "main.hxx"

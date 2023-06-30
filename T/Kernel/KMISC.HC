@@ -39,6 +39,15 @@ I64 EndianI64(I64 d)
   res.u8[0]=d.u8[7];
   return res;
 }
+#help_index "Bit"
+I64 BCnt(I64 d)
+{//Count set bits in I64.
+  I64 res=0,i;
+  for (i=0;i<8;i++)
+    res+=set_bits_table[d.u8[i]];
+  return res;
+}
+#help_index ""
 F64 Ona2Freq(I8 ona)
 {//Ona to freq. Ona=60 is 440.0Hz.
   if (!ona)

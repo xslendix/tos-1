@@ -8,6 +8,11 @@ public extern CAutoCompleteGlbls ac;
 
 #help_index "AutoComplete/Dictionary"
 public extern CAutoCompleteDictGlbls acd;
+
+#help_index "Bit"
+#help_file "::/Doc/Bit"
+
+
 #help_index "Boot"
 #help_file "::/Doc/Boot"
 public extern U0 Reboot();

@@ -1,4 +1,3 @@
-U8 *rev_bits_table,*set_bits_table;
 U0 SysGlblsInit() {
 	I64 i,j ;
     rev_bits_table=CAlloc(256);
