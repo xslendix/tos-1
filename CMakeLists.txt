@@ -6,6 +6,8 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN3
 	message(FATAL_ERROR "You can not use CMake to build from the root of it's source tree! Remove the CMakeCache.txt file from this directory, then create a separate directory (either below this directory or elsewhere), and then re-run CMake from there.")
 endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR} AND NOT WIN32)
 
+option(HEADLESS "Build tos headless" OFF)
+
 # lmao lol
 set(PROJECT_MAJOR_VERSION 4)
 set(PROJECT_MINOR_VERSION 2)
@@ -59,7 +61,6 @@ option(WARNINGS_AS_ERRORS "Set certain warnings to be treated as errors by the c
 set(CPP_EXECUTABLE_SOURCE_FILES
   main.cxx
   dbg.cxx
-  sdl_window.cxx
   runtime.cxx
   tos_aot.cxx
   mem.cxx
@@ -69,10 +70,21 @@ set(CPP_EXECUTABLE_SOURCE_FILES
 )
 
 set(C_EXECUTABLE_SOURCE_FILES
-  sound.c
   ext/dyad.c
   ext/argtable3.c
 )
+
+if(NOT HEADLESS)
+	set(CPP_EXECUTABLE_SOURCE_FILES
+		${CPP_EXECUTABLE_SOURCE_FILES}
+		sdl_window.cxx
+	)
+
+	set(C_EXECUTABLE_SOURCE_FILES
+		${C_EXECUTABLE_SOURCE_FILES}
+		sound.c
+	)
+endif()
 
 set_source_files_properties(CPP_EXECUTABLE_SOURCE_FILES
   PROPERTIES
@@ -119,57 +131,68 @@ target_compile_options(${PROJECT_NAME}
     -m64
 )
 
+if(HEADLESS)
+	target_compile_options(${PROJECT_NAME}
+		PRIVATE
+			-Werror=shadow
+			-fno-omit-frame-pointer
+			-m64
+			-DHEADLESS
+)
+endif()
 
 # libm
 target_link_libraries(${PROJECT_NAME} PRIVATE m)
 
-# sdl2 dep
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2)
+if(NOT HEADLESS)
+	# sdl2 dep
+	find_package(SDL2 REQUIRED)
+	include_directories(${SDL2_INCLUDE_DIR})
+	target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2)
+endif()
 
 # libuv dep
 include(Findlibuv)
 if(LIBUV_FOUND)
-  add_library(libuv INTERFACE)
-  target_link_libraries(libuv INTERFACE PkgConfig::LIBUV)
+	add_library(libuv INTERFACE)
+	target_link_libraries(libuv INTERFACE PkgConfig::LIBUV)
 else()
-  message(FATAL_ERROR install libuv)
+	message(FATAL_ERROR install libuv)
 endif()
 include_directories(${LIBUV_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBUV_LIBRARIES}) # uv)
 
 if(WIN32)
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-    synchronization shlwapi shcore dbghelp winmm -static)
-  # no winpthreads(i hate pthreads and SuspendThread() is rad)
-  set(CMAKE_THREAD_PREFER_PTHREAD OFF)
-  set(THREADS_PREFER_PTHREAD_FLAG OFF)
-  set(C_ABI_NAME "WIN64")
-  set(BIN_FORMAT "win64")
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		synchronization shlwapi shcore dbghelp winmm -static)
+	# no winpthreads(i hate pthreads and SuspendThread() is rad)
+	set(CMAKE_THREAD_PREFER_PTHREAD OFF)
+	set(THREADS_PREFER_PTHREAD_FLAG OFF)
+	set(C_ABI_NAME "WIN64")
+	set(BIN_FORMAT "win64")
 elseif((CMAKE_SYSTEM_NAME STREQUAL "Linux") OR
-       (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD"))
-  target_sources("${PROJECT_NAME}" PRIVATE ext/linenoise.c)
-  # ffi
-  set(C_ABI_NAME "SYSV")
-  set(BIN_FORMAT "elf64")
-  # uses this because cmake cant detect builtins
-  include(CheckCXXSourceCompiles)
-  check_cxx_source_compiles(
-    "#include <stdint.h>
-     int main() {
-       uint32_t i = 1, j = 1;
-       __atomic_compare_exchange_n(
-         &i, &j, 0, false,
-         __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST
-      );
-      return !(i == 0 && j == 1);
-    }" HAS_ATOMIC_LOAD_N)
-  if (NOT HAS_ATOMIC_LOAD_N)
-    message(FATAL_ERROR "No builtin atomics, wtf are you using as your compiler?")
-  endif()
+			 (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD"))
+	target_sources("${PROJECT_NAME}" PRIVATE ext/linenoise.c)
+	# ffi
+	set(C_ABI_NAME "SYSV")
+	set(BIN_FORMAT "elf64")
+	# uses this because cmake cant detect builtins
+	include(CheckCXXSourceCompiles)
+	check_cxx_source_compiles(
+		"#include <stdint.h>
+		 int main() {
+			 uint32_t i = 1, j = 1;
+			 __atomic_compare_exchange_n(
+				 &i, &j, 0, false,
+				 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST
+			);
+			return !(i == 0 && j == 1);
+		}" HAS_ATOMIC_LOAD_N)
+	if (NOT HAS_ATOMIC_LOAD_N)
+		message(FATAL_ERROR "No builtin atomics, wtf are you using as your compiler?")
+	endif()
 else()
-    message(FATAL_ERROR "Unsupported, stop using joke operating systems")
+		message(FATAL_ERROR "Unsupported, stop using joke operating systems")
 endif()
 
 # ffi

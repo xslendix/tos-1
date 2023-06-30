@@ -2,8 +2,10 @@
 #include "ffi.h"
 #include "multic.hxx"
 #include "runtime.hxx"
+#ifndef HEADLESS
 #include "sdl_window.hxx"
 #include "sound.h"
+#endif
 #include "tos_aot.hxx"
 #include "vfs.hxx"
 // its dangerous and lonely out here socrates
@@ -44,6 +46,7 @@ static BOOL WINAPI CtrlCHandlerRoutine(DWORD) {
 #endif
 
 static struct arg_lit *helpArg, *sixty_fps, *commandLineArg, *cb_sanitize;
+static struct arg_lit *silent, *noans;
 static struct arg_file *cmdLineFiles, *TDriveArg, *HCRTArg;
 
 static std::string bin_path{"HCRT.BIN"};
@@ -79,10 +82,12 @@ bool sanitize_clipboard = false;
 int main(int argc, char** argv) {
   void* argtable[] = {
       helpArg = arg_lit0("h", "help", "Display this help message."),
+#ifndef HEADLESS
       sixty_fps = arg_lit0("6", "60fps", "Run in 60 fps mode."),
       commandLineArg = arg_lit0("c", "com",
                                 "Start in command line "
                                 "mode,mount drive '/' at /."),
+#endif
       HCRTArg = arg_file0("f", "file", nullptr,
                           "Specifies where your HolyC runtime is"),
       TDriveArg = arg_file0("t", nullptr, "T(boot) Drive",
@@ -102,6 +107,8 @@ int main(int argc, char** argv) {
                              "sequences due to collision "
                              "with "
                              "DolDoc control chars)"),
+      silent = arg_lit0("s", "silent", "Silence compiler output"),
+      noans = arg_lit0("a", "noans", "No answer"),
       arg_end_(1),
   };
   int errs = arg_parse(argc, argv, argtable);
@@ -118,13 +125,17 @@ int main(int argc, char** argv) {
     exit(1);
   }
   // make drive T
+#ifndef HEADLESS
   if (commandLineArg->count)
+#endif
     VFsMountDrive('Z', ".");
   VFsThrdInit();
   // This is called before LoadHCRT so TOSLoader will not be
   // all fucked up, fyi
   RegisterFuncPtrs();
+#ifndef HEADLESS
   if (commandLineArg->count > 0) {
+#endif
     is_cmd_line = true;
     boot_str += "Cd(\"Z:/\");\n";
     for (int i = 0; i < cmdLineFiles->count; ++i) {
@@ -135,6 +146,11 @@ int main(int argc, char** argv) {
 #ifdef _WIN32
     std::replace(boot_str.begin(), boot_str.end(), '\\', '/');
 #endif
+  if (!silent->count)
+    boot_str += "EnableDebug;;\n";
+  if (!noans->count)
+    boot_str += "EnableAnswer;;\n";
+#ifndef HEADLESS
   }
   if (sixty_fps->count)
     boot_str += "SetFPS(60.);;\n";
@@ -142,15 +158,18 @@ int main(int argc, char** argv) {
     NewDrawWindow();
   if (is_win || !is_cmd_line)
     InitSound();
+#endif
   if (HCRTArg->count > 0)
     bin_path = HCRTArg->filename[0];
   if (fs::exists(bin_path)) {
-    std::cerr << "Using " << bin_path << " as the default binary.\n";
+		if (silent->count != 0)
+			std::cerr << "Using " << bin_path << " as the default binary.\n";
     LaunchCore0(Core0);
   } else {
     std::cerr << bin_path << " DOES NOT EXIST\n";
     return 1;
   }
+#ifndef HEADLESS
   if (!is_cmd_line) {
 #ifdef _WIN32
     SetConsoleCtrlHandler(CtrlCHandlerRoutine, TRUE);
@@ -159,8 +178,11 @@ int main(int argc, char** argv) {
       sanitize_clipboard = true;
     InputLoop(&prog_exit);
   } else {
+#endif
     WaitForCore0();
     FFI_CALL_TOS_0(TOSLoader["__FreeCPUs"][0].val);
+#ifndef HEADLESS
   }
+#endif
   return 0;
 }

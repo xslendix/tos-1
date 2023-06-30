@@ -7665,3 +7665,6 @@ extern U0 RedSeaISO9660(U8 *iso_filename,U8 drv_let);
 extern I64 RedSeaISOPass1(CDirEntry *tmpde);
 extern I64 RedSeaISO(U8 *_iso_filename=NULL,U8 *_src_dir,U8 *_stage2_filename=NULL);
 extern U8 Mount2(U8 boot_drv_let,CDoc *_doc,Bool _caller_is_prtdsk);
+
+extern U0 EnableDebug();
+extern U0 EnableAnswer();

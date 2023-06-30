@@ -3,8 +3,10 @@
 #include "main.hxx"
 #include "mem.hxx"
 #include "multic.hxx"
+#ifndef HEADLESS
 #include "sdl_window.hxx"
 #include "sound.h"
+#endif
 #include "tos_aot.hxx"
 #include "vfs.hxx"
 
@@ -306,7 +308,9 @@ static void STK_UnblockSignals() {
 }
 
 static void STK__GrPaletteColorSet(int64_t* stk) {
+#ifndef HEADLESS
   GrPaletteColorSet(stk[0], stk[1]);
+#endif
 }
 
 static uint64_t STK___IsValidPtr(uintptr_t* stk) {
@@ -396,7 +400,9 @@ static int64_t STK_IsDir(uint64_t* stk) {
 }
 
 static int64_t STK_DrawWindowUpdate(int64_t* stk) {
+#ifndef HEADLESS
   DrawWindowUpdate((CDrawWindow*)stk[0], (int8_t*)stk[1], stk[2], stk[3]);
+#endif
   return 0;
 }
 
@@ -425,12 +431,16 @@ int64_t STK___GetTicks() {
 }
 
 int64_t STK_SetKBCallback(int64_t* stk) {
+#ifndef HEADLESS
   SetKBCallback((void*)stk[0], (void*)stk[1]);
+#endif
   return 0;
 }
 
 int64_t STK_SetMSCallback(int64_t* stk) {
+#ifndef HEADLESS
   SetMSCallback((void*)stk[0]);
+#endif
   return 0;
 }
 
@@ -460,12 +470,16 @@ int64_t STK_SetGs(int64_t* stk) {
 }
 
 int64_t STK_SndFreq(uint64_t* stk) {
+#ifndef HEADLESS
   SndFreq(stk[0]);
+#endif
   return 0;
 }
 int64_t STK_SetClipboardText(int64_t* stk) {
   // SDL_SetClipboardText(stk[0]);
+#ifndef HEADLESS
   SetClipboard((char*)stk[0]);
+#endif
   return 0;
 }
 
@@ -486,7 +500,11 @@ int64_t STK___GetStr(int64_t* stk) {
 }
 
 char* STK_GetClipboardText(int64_t* stk) {
+#ifndef HEADLESS
   return HolyStrDup(ClipboardText().c_str());
+#else
+	return HolyStrDup("");
+#endif
 }
 
 int64_t STK_FUnixTime(int64_t* stk) {
@@ -620,7 +638,9 @@ int64_t STK_SetVolume(int64_t* stk) {
     int64_t i;
   } un;
   un.i = stk[0];
+#ifndef HEADLESS
   SetVolume(un.flt);
+#endif
   return 0;
 }
 
@@ -629,7 +649,9 @@ uint64_t STK_GetVolume(int64_t* stk) {
     double flt;
     int64_t i;
   } un;
+#ifndef HEADLESS
   un.flt = GetVolume();
+#endif
   return un.i;
 }
 
@@ -757,6 +779,13 @@ static void RegisterFunctionPtr(std::string& blob, char const* name, void* fp,
   sym.val = reinterpret_cast<void*>(off);
   TOSLoader[name].emplace_back(sym);
 }
+
+#ifdef HEADLESS
+struct CDrawWindow;
+CDrawWindow* NewDrawWindow() {
+	return NULL;
+}
+#endif
 
 void RegisterFuncPtrs() {
   std::string ffi_blob;

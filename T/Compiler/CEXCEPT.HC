@@ -1,5 +1,6 @@
 U0 LexPutToken(CCmpCtrl *cc)
 {//Print cur token to StdOut. (Crude)
+	if (!debug_output) return;
   '"';
   if (cc->token==TK_IDENT || cc->token==TK_STR)
     "%s",cc->cur_str;
@@ -21,6 +22,7 @@ U0 LexPutToken(CCmpCtrl *cc)
 
 U8 *LexPutLine(CCmpCtrl *cc,U8 *start)
 {//Print cur pos to end of line to StdOut.
+	if (!debug_output) return;
   I64 ch;
   U8 *ptr;
   if (!start) return NULL;
@@ -49,6 +51,7 @@ U8 *LexPutLine(CCmpCtrl *cc,U8 *start)
 
 U0 LexPutPos(CCmpCtrl *cc)
 {//Print token, line link and, then, $LK,"LexPutLine",A="MN:LexPutLine"$().
+	if (!debug_output) return;
   LexPutToken(cc);
   FixSet(cc->lex_include_stk->full_name,cc->lex_include_stk->line_num);
   if (__IsCmdLine)
@@ -65,6 +68,7 @@ U0 LexPutPos(CCmpCtrl *cc)
 
 U0 LexWarn(CCmpCtrl *cc,U8 *str=NULL)
 {//Print warn msg, then, $LK,"LexPutPos",A="MN:LexPutPos"$().
+	if (!debug_output) return;
   if (str) PrintWarn(str);
   if (cc->htc.fun) {
     "in fun '%s'.\n",cc->htc.fun->str;
@@ -81,6 +85,7 @@ U0 LexWarn(CCmpCtrl *cc,U8 *str=NULL)
 
 U0 LexExcept(CCmpCtrl *cc,U8 *str=NULL)
 {//Print err msg, $LK,"LexPutPos",A="MN:LexPutPos"$() and throw exception.
+	if (!debug_output) return;
   if (str) PrintErr(str);
   //if (!0) TODO RESTORE
   //  AdamErr("Task:%08X %s\n",Fs,str);
@@ -94,6 +99,7 @@ U0 LexExcept(CCmpCtrl *cc,U8 *str=NULL)
 
 U0 UndefinedExtern()
 {
+	if (!debug_output) return;
   PrintErr("Undefined Extern\nat %P\n",Caller);
   throw('UndefExt');
 }
@@ -106,6 +112,7 @@ U0 UnusedExternWarning(CCmpCtrl *cc,CHashClass *tmpc)
 
 U0 ParenWarning(CCmpCtrl *cc)
 {
+	if (!debug_output) return;
   if (Bt(&cc->opts,OPTf_WARN_PAREN) &&
 	!(cc->lex_include_stk->flags&LFSF_DEFINE))
     LexWarn(cc,"Unnecessary parenthesis ");
@@ -113,6 +120,7 @@ U0 ParenWarning(CCmpCtrl *cc)
 
 U0 ICClassPut(CHashClass *c)
 {
+	if (!debug_output) return;
   I64 i;
   if (!c) return;
   if (c->ptr_stars_cnt>4) {
@@ -133,6 +141,7 @@ U0 ICClassPut(CHashClass *c)
 
 U0 ICArgPut(CICArg *a,I64 type_pointed_to)
 {
+	if (!debug_output) return;
   if (type_pointed_to)
     "[%Z](%Z) %Z ",a->type.raw_type,"ST_RAW_TYPES",
 	  type_pointed_to,"ST_RAW_TYPES",Bsr(a->type>>8)+1,"ST_TY_TYPES";
@@ -176,6 +185,7 @@ U0 ICArgPut(CICArg *a,I64 type_pointed_to)
 
 U0 ICPut(CCmpCtrl *cc,CIntermediateCode *tmpi)
 {
+	if (!debug_output) return;
   I64 opcode=tmpi->ic_code,i;
   if (opcode>=IC_END_EXP && opcode!=IC_NOP2) {
     "%15ts %016X ",intermediate_code_table[opcode].name,tmpi->ic_data;

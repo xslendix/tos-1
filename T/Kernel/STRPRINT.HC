@@ -1,3 +1,9 @@
+Bool debug_output = OFF;
+Bool answer_enabled = OFF;
+
+U0 EnableDebug() { debug_output = ON; }
+U0 EnableAnswer() { answer_enabled = ON; }
+
 U0 SPutChar(U8 **_dst,U8 ch,U8 **_buf)
 {
   I64 i;
