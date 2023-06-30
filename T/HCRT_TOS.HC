@@ -63,7 +63,7 @@ CTask *adam_task=Fs;
 #include "MAlloc2.HC"
 #include "BlkDev2/MakeBlkDev.HC"
 #include "Kernel/Sched.HC"
-#ifdef COMPONET_COMPILER
+#ifdef COMPONENT_COMPILER
 #include "Compiler/CMP_PRJ.HC"
 CInit;
 #endif
@@ -79,7 +79,7 @@ CInit;
 #include "Kernel/KLOAD.HC"
 #include "Kernel/KEND.HC"
 #include "Kernel/EDLITE.HC"
-#ifdef COMPONET_GRAPHICS
+#ifdef COMPONENT_GRAPHICS
 #include "Adam/TASK_SETTINGS.HC"
 #include "Adam/ASND.HC"
 #include "Adam/AMathODE.HC.Z";

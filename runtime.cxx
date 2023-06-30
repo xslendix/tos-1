@@ -1,3 +1,4 @@
+#include "runtime.hxx"
 #include "TOSPrint.hxx"
 #include "ffi.h"
 #include "main.hxx"
@@ -195,12 +196,12 @@ static int64_t STK_UVUDPConnect(int64_t* stk) {
 }
 
 static void STK_DyadInit() {
-  static int64_t i;
-  if (!i) {
-    i = 1;
-    dyad_init();
-    dyad_setUpdateTimeout(0.);
-  }
+  static bool init = false;
+  if (init)
+    return;
+  init = true;
+  dyad_init();
+  dyad_setUpdateTimeout(0.);
 }
 
 static void STK_DyadUpdate() {
@@ -406,7 +407,7 @@ static int64_t STK_DrawWindowUpdate(int64_t* stk) {
   return 0;
 }
 
-int64_t STK___GetTicksHP() {
+static int64_t STK___GetTicksHP() {
 #ifndef _WIN32
   struct timespec ts;
   int64_t theTick = 0U;
@@ -426,56 +427,57 @@ int64_t STK___GetTicksHP() {
 #endif
 }
 
-int64_t STK___GetTicks() {
+static uint64_t STK___GetTicks() {
   return GetTicks();
 }
 
-int64_t STK_SetKBCallback(int64_t* stk) {
+static int64_t STK_SetKBCallback(int64_t* stk) {
 #ifndef HEADLESS
   SetKBCallback((void*)stk[0], (void*)stk[1]);
 #endif
   return 0;
 }
 
-int64_t STK_SetMSCallback(int64_t* stk) {
+static int64_t STK_SetMSCallback(int64_t* stk) {
 #ifndef HEADLESS
   SetMSCallback((void*)stk[0]);
 #endif
   return 0;
 }
 
-int64_t STK___AwakeCore(int64_t* stk) {
+static int64_t STK___AwakeCore(int64_t* stk) {
   AwakeFromSleeping(stk[0]);
   return 0;
 }
 
-int64_t STK___SleepHP(int64_t* stk) {
+static int64_t STK___SleepHP(int64_t* stk) {
   SleepHP(stk[0]);
   return 0;
 }
 
-int64_t STK___Sleep(int64_t* stk) {
-  SleepHP((uint64_t)stk[0] * 1000);
+static int64_t STK___Sleep(uint64_t* stk) {
+  SleepHP(stk[0] * 1000);
   return 0;
 }
 
-int64_t STK_SetFs(int64_t* stk) {
+static int64_t STK_SetFs(int64_t* stk) {
   SetFs((void*)stk[0]);
   return 0;
 }
 
-int64_t STK_SetGs(int64_t* stk) {
+static int64_t STK_SetGs(int64_t* stk) {
   SetGs((void*)stk[0]);
   return 0;
 }
 
-int64_t STK_SndFreq(uint64_t* stk) {
+static int64_t STK_SndFreq(uint64_t* stk) {
 #ifndef HEADLESS
   SndFreq(stk[0]);
 #endif
   return 0;
 }
-int64_t STK_SetClipboardText(int64_t* stk) {
+
+static int64_t STK_SetClipboardText(int64_t* stk) {
   // SDL_SetClipboardText(stk[0]);
 #ifndef HEADLESS
   SetClipboard((char*)stk[0]);
@@ -483,7 +485,7 @@ int64_t STK_SetClipboardText(int64_t* stk) {
   return 0;
 }
 
-int64_t STK___GetStr(int64_t* stk) {
+static int64_t STK___GetStr(int64_t* stk) {
   char *s = NULL, *r = NULL;
 #ifndef _WIN32
   s = linenoise((char*)stk[0]);
@@ -499,24 +501,25 @@ int64_t STK___GetStr(int64_t* stk) {
   return (int64_t)r;
 }
 
-char* STK_GetClipboardText(int64_t* stk) {
+static char* STK_GetClipboardText(int64_t* stk) {
 #ifndef HEADLESS
-  return HolyStrDup(ClipboardText().c_str());
+  std::string clip{ClipboardText()};
+  return HolyStrDup(clip.c_str());
 #else
 	return HolyStrDup("");
 #endif
 }
 
-int64_t STK_FUnixTime(int64_t* stk) {
+static int64_t STK_FUnixTime(int64_t* stk) {
   return VFsUnixTime((char*)stk[0]);
 }
 
-int64_t STK_VFsFTrunc(int64_t* stk) {
+static uint64_t STK_VFsFTrunc(int64_t* stk) {
   fs::resize_file(VFsFileNameAbs((char*)stk[0]), stk[1]);
   return 0;
 }
 
-int64_t STK___FExists(int64_t* stk) {
+static int64_t STK___FExists(int64_t* stk) {
   return VFsFileExists((char*)stk[0]);
 }
 
@@ -524,13 +527,13 @@ int64_t STK___FExists(int64_t* stk) {
 
 #include <time.h>
 
-uint64_t STK_UnixNow(int64_t* stk) {
+static uint64_t STK_UnixNow(int64_t* stk) {
   return time(nullptr);
 }
 
 #else
 
-uint64_t STK_UnixNow(int64_t* stk) {
+static uint64_t STK_UnixNow(int64_t* stk) {
   int64_t r;
   FILETIME ft;
   GetSystemTimeAsFileTime(&ft);
@@ -547,91 +550,91 @@ uint64_t mp_cnt(int64_t*) {
   return thread::hardware_concurrency();
 }
 
-void STK___SpawnCore(int64_t* stk) {
+static void STK___SpawnCore(uint64_t* stk) {
   CreateCore(stk[0], (void*)stk[1]);
 }
 
-int64_t STK_NewVirtualChunk(int64_t* stk) {
-  return (int64_t)NewVirtualChunk(stk[0], stk[1]);
+static void* STK_NewVirtualChunk(size_t* stk) {
+  return NewVirtualChunk(stk[0], stk[1]);
 }
 
-int64_t STK_FreeVirtualChunk(int64_t* stk) {
+static uint64_t STK_FreeVirtualChunk(int64_t* stk) {
   FreeVirtualChunk((void*)stk[0], stk[1]);
   return 0;
 }
 
-int64_t STK_VFsSetPwd(int64_t* stk) {
+static uint64_t STK_VFsSetPwd(int64_t* stk) {
   VFsSetPwd((char*)stk[0]);
   return 1;
 }
 
-int64_t STK_VFsExists(int64_t* stk) {
+static uint64_t STK_VFsExists(int64_t* stk) {
   return VFsFileExists((char*)stk[0]);
 }
 
-int64_t STK_VFsIsDir(int64_t* stk) {
+static uint64_t STK_VFsIsDir(int64_t* stk) {
   return VFsIsDir((char*)stk[0]);
 }
 
-int64_t STK_VFsFSize(int64_t* stk) {
+static int64_t STK_VFsFSize(int64_t* stk) {
   return VFsFSize((char*)stk[0]);
 }
 
-int64_t STK_VFsFRead(int64_t* stk) {
-  return (intptr_t)VFsFileRead((char const*)stk[0], (uint64_t* const)stk[1]);
+static uint64_t STK_VFsFRead(uintptr_t* stk) {
+  return (uintptr_t)VFsFileRead((char const*)stk[0], (uint64_t* const)stk[1]);
 }
 
-int64_t STK_VFsFWrite(int64_t* stk) {
+static uint64_t STK_VFsFWrite(uintptr_t* stk) {
   return VFsFileWrite((char*)stk[0], (char*)stk[1], stk[2]);
 }
 
-uint64_t STK_VFsDirMk(uintptr_t* stk) {
+static uint64_t STK_VFsDirMk(uintptr_t* stk) {
   return VFsDirMk((char*)stk[0], VFS_CDF_MAKE);
 }
 
-uint64_t STK_VFsDir(uintptr_t* stk) {
+static uint64_t STK_VFsDir(uintptr_t* stk) {
   return (uintptr_t)VFsDir((char*)stk[0]);
 }
 
-int64_t STK_VFsDel(uintptr_t* stk) {
+static uint64_t STK_VFsDel(uintptr_t* stk) {
   return VFsDel((char*)stk[0]);
 }
 
-uint64_t STK_VFsFOpenW(uintptr_t* stk) {
+static uint64_t STK_VFsFOpenW(uintptr_t* stk) {
   return (uintptr_t)VFsFOpen((char*)stk[0], "w+b");
 }
 
-uint64_t STK_VFsFOpenR(uintptr_t* stk) {
+static uint64_t STK_VFsFOpenR(uintptr_t* stk) {
   return (uintptr_t)VFsFOpen((char*)stk[0], "rb");
 }
 
-int64_t STK_VFsFClose(uintptr_t* stk) {
+static uint64_t STK_VFsFClose(uintptr_t* stk) {
   fclose((FILE*)stk[0]);
   return 0;
 }
 
-int64_t STK_VFsFBlkRead(uintptr_t* stk) {
+static int64_t STK_VFsFBlkRead(uintptr_t* stk) {
   fflush((FILE*)stk[3]);
   return stk[2] == fread((void*)stk[0], stk[1], stk[2], (FILE*)stk[3]);
 }
 
-int64_t STK_VFsFBlkWrite(uintptr_t* stk) {
+static int64_t STK_VFsFBlkWrite(uintptr_t* stk) {
   bool r = stk[2] == fwrite((void*)stk[0], stk[1], stk[2], (FILE*)stk[3]);
   fflush((FILE*)stk[3]);
   return r;
 }
 
-int64_t STK_VFsFSeek(int64_t* stk) {
+static int64_t STK_VFsFSeek(int64_t* stk) {
   fseek((FILE*)stk[1], stk[0], SEEK_SET);
   return 0;
 }
 
-int64_t STK_VFsSetDrv(int64_t* stk) {
+static int64_t STK_VFsSetDrv(int64_t* stk) {
   VFsSetDrv(stk[0]);
   return 0;
 }
 
-int64_t STK_SetVolume(int64_t* stk) {
+static int64_t STK_SetVolume(int64_t* stk) {
   static_assert(alignof(double) == alignof(uint64_t));
   union {
     double flt;
@@ -644,7 +647,7 @@ int64_t STK_SetVolume(int64_t* stk) {
   return 0;
 }
 
-uint64_t STK_GetVolume(int64_t* stk) {
+static uint64_t STK_GetVolume(int64_t* stk) {
   union {
     double flt;
     int64_t i;

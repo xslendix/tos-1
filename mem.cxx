@@ -81,7 +81,8 @@ void* NewVirtualChunk(size_t sz, bool low32) {
       ret = mmap(reinterpret_cast<void*>(down), sz / ps * ps + pad,
                  PROT_EXEC | PROT_WRITE | PROT_READ,
                  MAP_PRIVATE | MAP_ANON | MAP_FIXED, -1, 0);
-    }
+    } else
+      return ret;
 #endif
   } else // data heap
     ret = mmap(nullptr, sz / ps * ps + pad, PROT_WRITE | PROT_READ,
@@ -109,10 +110,9 @@ void* NewVirtualChunk(size_t sz, bool low32) {
       // VirtualAlloc
       addr = ((uint64_t)ent.BaseAddress + dwAllocationGranularity - 1) &
              ~(dwAllocationGranularity - 1);
-      if ((ent.State == MEM_FREE) && (sz <= (alloc - addr))) {
+      if (ent.State == MEM_FREE && sz <= alloc - addr)
         return VirtualAlloc((void*)addr, sz, MEM_COMMIT | MEM_RESERVE,
                             PAGE_EXECUTE_READWRITE);
-      }
     }
     return nullptr;
   } else // data heap
